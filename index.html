@@ -3,551 +3,601 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Mobile Battle Royale - LANDSCAPE ONLY</title>
+    <title>Mobile Battle Royale</title>
     <style>
-        /* MOBILE-FIRST RESET */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: none;
-            touch-action: manipulation;
         }
 
-        html, body {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            overflow: hidden;
             width: 100vw;
             height: 100vh;
-            overflow: hidden;
-            background: #0a0e17;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             position: fixed;
+            /* Force fullscreen */
+            height: -webkit-fill-available;
+            height: fill-available;
         }
 
-        /* ROTATION OVERLAY */
-        #rotate-overlay {
+        html {
+            /* Force fullscreen on mobile */
+            height: -webkit-fill-available;
+            height: fill-available;
+            overflow: hidden;
+        }
+
+        /* Fullscreen overlay */
+        #fullscreen-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #0a0e17;
-            color: white;
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 10000;
-            text-align: center;
+            z-index: 2000;
             padding: 20px;
-        }
-
-        .rotate-icon {
-            font-size: 80px;
-            margin-bottom: 30px;
-            animation: rotateAnimation 2s infinite;
-        }
-
-        @keyframes rotateAnimation {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(90deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        .rotate-message {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2a9d8f;
-            margin-bottom: 15px;
-        }
-
-        .rotate-instruction {
-            font-size: 18px;
-            color: #8ecae6;
-            max-width: 300px;
-            line-height: 1.4;
-        }
-
-        /* GAME CONTAINER - LANDSCAPE ONLY */
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            display: none;
-            flex-direction: column;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-        }
-
-        /* TOP BAR - GAME INFO */
-        #top-bar {
-            height: 60px;
-            background: rgba(21, 26, 40, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            border-bottom: 2px solid #2a9d8f;
-            flex-shrink: 0;
-        }
-
-        .player-display {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .player-avatar {
-            font-size: 28px;
-            animation: playerPulse 2s infinite;
-        }
-
-        @keyframes playerPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .player-info h3 {
-            color: #2a9d8f;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .player-info p {
-            color: #8ecae6;
-            font-size: 14px;
-        }
-
-        .health-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .health-bar {
-            width: 100px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .health-fill {
-            height: 100%;
-            border-radius: 5px;
-            transition: width 0.3s ease;
-        }
-
-        .health-text {
-            font-weight: bold;
-            font-size: 18px;
-            min-width: 45px;
             text-align: center;
         }
 
-        /* MAIN GAME AREA - FIXED LAYOUT */
-        #game-area {
-            flex: 1;
-            display: flex;
-            padding: 10px;
-            gap: 10px;
-            min-height: 0;
-            height: calc(100vh - 240px); /* Account for top bar and controls */
-        }
-
-        /* GAME BOARD - SQUARE CONTAINER */
-        #board-container {
-            flex: 3;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        #board-header {
-            height: 40px;
-            background: rgba(42, 157, 143, 0.2);
-            border-radius: 10px 10px 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #2a9d8f;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        #board-wrapper {
-            flex: 1;
-            background: #1c3b2e;
-            border-radius: 0 0 10px 10px;
-            border: 3px solid #2a9d8f;
-            position: relative;
-            overflow: hidden;
-            min-height: 0;
-            /* Force square */
-            aspect-ratio: 1 / 1;
-            max-height: 100%;
-            margin: 0 auto;
-        }
-
-        #game-board {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* SIDEBAR - COMPACT */
-        #sidebar {
-            flex: 2;
-            min-width: 180px;
-            max-width: 220px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .panel {
-            background: rgba(21, 26, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            border: 2px solid #2a9d8f;
-            padding: 12px;
-        }
-
-        .panel.compact {
-            padding: 10px;
-        }
-
-        .panel-title {
-            color: #2a9d8f;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* WEAPON PANEL */
-        .weapon-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .weapon-icon {
+        #fullscreen-overlay h1 {
+            color: #3498db;
+            margin-bottom: 30px;
             font-size: 28px;
         }
 
-        .weapon-info {
-            flex: 1;
-        }
-
-        .weapon-name {
-            font-weight: bold;
-            color: #f4a261;
-            font-size: 14px;
-            margin-bottom: 2px;
-        }
-
-        .weapon-stats {
-            color: #8ecae6;
-            font-size: 11px;
-        }
-
-        /* STATUS PANEL - COMPACT */
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .status-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px;
-            border-radius: 6px;
-        }
-
-        .status-label {
-            color: #8ecae6;
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-
-        .status-value {
+        #fullscreen-btn {
+            background: #2ecc71;
+            border: none;
+            border-radius: 15px;
             color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        /* PLAYERS PANEL - COMPACT */
-        .player-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px;
-            margin-bottom: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            border-left: 3px solid transparent;
-        }
-
-        .player-item.current {
-            background: rgba(42, 157, 143, 0.2);
-            border-left-color: #2a9d8f;
-        }
-
-        .player-emoji-small {
             font-size: 18px;
-        }
-
-        .player-status {
-            font-size: 12px;
-        }
-
-        /* GAMEPAD CONTROLS - ALWAYS VISIBLE */
-        #gamepad-container {
-            height: 140px;
-            background: rgba(21, 26, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 2px solid #2a9d8f;
-            padding: 10px;
+            font-weight: 600;
+            padding: 15px 30px;
+            margin: 20px 0;
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 10px;
-            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
         }
 
-        .movement-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
+        #fullscreen-btn:active {
+            transform: scale(0.98);
         }
 
-        .movement-pad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 5px;
-        }
-
-        .move-btn {
-            width: 55px;
-            height: 55px;
-            background: rgba(42, 157, 143, 0.8);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-            transition: all 0.1s;
-        }
-
-        .move-btn:active {
-            transform: scale(0.9);
-            background: rgba(42, 157, 143, 1);
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .action-btn {
-            flex: 1;
-            height: 45px;
-            background: linear-gradient(135deg, #2a9d8f, #264653);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            touch-action: manipulation;
-            transition: all 0.1s;
-            min-width: 70px;
-        }
-
-        .action-btn:active {
-            transform: scale(0.95);
-        }
-
-        .action-btn.combat {
-            background: linear-gradient(135deg, #e63946, #d62828);
-        }
-
-        .action-btn.special {
-            background: linear-gradient(135deg, #9d4edd, #560bad);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            transform: none !important;
-        }
-
-        /* AIM OVERLAY */
-        #aim-overlay {
-            position: absolute;
+        /* Landscape warning */
+        #landscape-warning {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .aim-cell {
-            position: absolute;
-            border: 3px solid #ffba08;
-            background: rgba(255, 186, 8, 0.1);
-            border-radius: 4px;
-            box-sizing: border-box;
-            animation: aimPulse 1s infinite;
-        }
-
-        .aim-range {
-            position: absolute;
-            border: 2px dashed rgba(255, 186, 8, 0.3);
-            background: rgba(255, 186, 8, 0.05);
-            border-radius: 4px;
-            box-sizing: border-box;
-            pointer-events: none;
-        }
-
-        @keyframes aimPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        /* MODALS */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.9);
+            background: #1a1a2e;
             display: none;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 20px;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #1a1f2e, #0a0e17);
-            border-radius: 15px;
-            padding: 25px;
-            max-width: 400px;
-            width: 100%;
-            border: 3px solid #2a9d8f;
             text-align: center;
         }
 
-        .modal-title {
-            color: #2a9d8f;
+        #landscape-warning h1 {
+            color: #ff4757;
+            margin-bottom: 20px;
             font-size: 24px;
-            margin-bottom: 15px;
         }
 
-        .modal-message {
-            color: #8ecae6;
+        #landscape-warning p {
+            font-size: 18px;
+            margin-bottom: 30px;
             line-height: 1.5;
-            margin-bottom: 25px;
         }
 
-        .modal-btn {
+        #landscape-warning .rotate-icon {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: rotate 2s infinite;
+        }
+
+        @keyframes rotate {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-90deg); }
+        }
+
+        /* Main game container */
+        #game-container {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            /* Ensure it fills screen */
+            height: -webkit-fill-available;
+            height: fill-available;
+        }
+
+        /* Game layout */
+        .game-layout {
+            display: flex;
+            height: 100%;
             width: 100%;
-            height: 50px;
-            background: linear-gradient(135deg, #2a9d8f, #264653);
-            border: none;
-            border-radius: 10px;
-            color: white;
+            background: #2d3436;
+        }
+
+        /* Left controls - FIXED WIDTH to prevent overflow */
+        #left-controls {
+            width: 110px;
+            min-width: 110px;
+            max-width: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px;
+            gap: 6px;
+            background: rgba(45, 52, 54, 0.95);
+            border-right: 2px solid #34495e;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Mini info */
+        .mini-info {
+            width: 100%;
+            background: rgba(52, 73, 94, 0.7);
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.2;
+            border: 1px solid #2c3e50;
+            margin-bottom: 2px;
+            box-sizing: border-box;
+        }
+
+        .current-player {
+            color: #3498db;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .moves-info {
+            color: #f39c12;
+            font-size: 10px;
+        }
+
+        /* Action buttons - FIXED SIZE to fit */
+        .action-btn {
+            width: 75px;
+            min-width: 75px;
+            max-width: 75px;
+            height: 40px;
+            background: #3498db;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            transition: all 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            padding: 2px;
+            text-align: center;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .action-btn .icon {
+            font-size: 14px;
+            margin-bottom: 1px;
+        }
+
+        .action-btn.roll { background: #f39c12; }
+        .action-btn.aim { background: #e74c3c; }
+        .action-btn.shoot { background: #c0392b; }
+        .action-btn.end { background: #7f8c8d; }
+        .action-btn.info { 
+            background: #9b59b6;
+            height: 35px;
+            margin-top: auto;
+        }
+        .action-btn.rules { 
+            background: #1abc9c;
+            height: 35px;
+        }
+
+        /* Center game area */
+        #center-game {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Canvas container - PERFECTLY CENTERED */
+        #canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: #2d3436;
+            padding: 0;
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+            background: #2d3436;
+            /* Center canvas perfectly */
+            margin: auto;
+            touch-action: none;
+        }
+
+        /* Right controls */
+        #right-controls {
+            width: 130px;
+            min-width: 130px;
+            max-width: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 8px 5px;
+            gap: 10px;
+            background: rgba(45, 52, 54, 0.95);
+            border-left: 2px solid #34495e;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Movement D-pad - FIXED POSITION */
+        #movement-controls {
+            display: grid;
+            grid-template-areas:
+                ". up ."
+                "left . right"
+                ". down .";
+            gap: 6px;
+            background: rgba(52, 73, 94, 0.7);
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #2c3e50;
+            width: 90px;
+            height: 90px;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .movement-btn {
+            width: 45px;
+            height: 45px;
+            background: #34495e;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
             touch-action: manipulation;
+            transition: all 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-sizing: border-box;
         }
 
-        /* UTILITY */
-        .hidden {
-            display: none !important;
+        .movement-btn:active {
+            background: #2c3e50;
+            transform: scale(0.95);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* LANDSCAPE ORIENTATION STYLES */
-        @media (orientation: landscape) and (max-height: 600px) {
-            #top-bar {
-                height: 50px;
-                padding: 0 10px;
+        .movement-btn.up { grid-area: up; }
+        .movement-btn.left { grid-area: left; }
+        .movement-btn.right { grid-area: right; }
+        .movement-btn.down { grid-area: down; }
+
+        /* Weapon info */
+        .weapon-info {
+            width: 100%;
+            background: rgba(52, 73, 94, 0.7);
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+            font-size: 10px;
+            border: 1px solid #2c3e50;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+        }
+
+        .weapon-name {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 60;
+            backdrop-filter: blur(5px);
+            border: 1px solid;
+            max-width: 90%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-aiming {
+            border-color: yellow;
+            color: yellow;
+            animation: pulse-status 1s infinite;
+        }
+
+        @keyframes pulse-status {
+            0%, 100% { box-shadow: 0 0 5px currentColor; }
+            50% { box-shadow: 0 0 15px currentColor; }
+        }
+
+        /* Panels */
+        .panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+        }
+
+        .panel.active {
+            display: flex;
+        }
+
+        .panel-content {
+            background: rgba(45, 52, 54, 0.95);
+            margin: 10px;
+            border-radius: 15px;
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-height: calc(100vh - 20px);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #34495e;
+        }
+
+        .panel-header h2 {
+            color: #3498db;
+            font-size: 18px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Players list */
+        .players-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .player-info {
+            background: rgba(52, 73, 94, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .player-info.current {
+            border-left: 4px solid #3498db;
+            background: rgba(52, 73, 94, 0.8);
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .player-emoji {
+            font-size: 18px;
+        }
+
+        .player-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .player-hp {
+            width: 100%;
+            height: 5px;
+            background: #2c3e50;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .player-hp-bar {
+            height: 100%;
+            background: #2ecc71;
+            border-radius: 3px;
+        }
+
+        .player-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 10px;
+            color: #95a5a6;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            overflow: hidden;
+        }
+
+        .stat-label {
+            color: #ecf0f1;
+            white-space: nowrap;
+        }
+
+        /* Aim overlay */
+        #aim-overlay, #shotgun-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .aim-cell {
+            position: absolute;
+            background: rgba(255, 255, 0, 0.3);
+            border: 2px solid yellow;
+            border-radius: 3px;
+            animation: pulse-aim 0.8s infinite;
+        }
+
+        @keyframes pulse-aim {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        .shotgun-cell {
+            position: absolute;
+            background: rgba(255, 165, 0, 0.3);
+            border: 2px solid orange;
+            border-radius: 3px;
+        }
+
+        /* Ensure no overflow anywhere */
+        body, html, #game-container, .game-layout, #center-game, #canvas-container,
+        #left-controls, #right-controls, .mini-info, .weapon-info {
+            overflow: hidden !important;
+        }
+
+        /* Hide browser UI on mobile */
+        @media (display-mode: fullscreen) {
+            #game-container {
+                height: 100vh;
             }
-            
-            .player-avatar {
-                font-size: 24px;
-            }
-            
-            .health-bar {
-                width: 80px;
-            }
-            
-            #gamepad-container {
-                height: 120px;
-                padding: 8px;
-            }
-            
-            .move-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
+        }
+
+        /* Very small screens */
+        @media (max-height: 500px) {
+            #left-controls { width: 91px; min-width: 91px; max-width: 91px; }
+            #right-controls { width: 110px; min-width: 110px; max-width: 110px; }
             
             .action-btn {
-                height: 40px;
-                font-size: 11px;
+                width: 65px;
                 min-width: 65px;
+                max-width: 65px;
+                height: 35px;
+                font-size: 9px;
             }
             
-            #game-area {
-                height: calc(100vh - 220px);
-            }
-        }
-
-        @media (orientation: landscape) and (max-height: 500px) {
-            #gamepad-container {
-                height: 100px;
-            }
-            
-            .move-btn {
-                width: 45px;
-                height: 45px;
+            .movement-btn {
+                width: 40px;
+                height: 40px;
                 font-size: 18px;
             }
             
+            #movement-controls {
+                width: 80px;
+                height: 80px;
+                gap: 5px;
+            }
+            
+            .mini-info, .weapon-info {
+                font-size: 9px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            #left-controls { width: 85px; min-width: 85px; max-width: 85px; }
+            #right-controls { width: 98px; min-width: 98px; max-width: 98px; }
+            
             .action-btn {
-                height: 35px;
-                font-size: 10px;
+                width: 60px;
                 min-width: 60px;
+                max-width: 60px;
+                height: 32px;
+                font-size: 8px;
             }
             
-            #game-area {
-                height: calc(100vh - 200px);
+            .movement-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
             }
             
-            #sidebar {
-                min-width: 160px;
-                max-width: 180px;
+            #movement-controls {
+                width: 70px;
+                height: 70px;
+                gap: 4px;
             }
         }
 
@@ -555,849 +605,948 @@
             #game-container {
                 display: none !important;
             }
-            
-            #rotate-overlay {
-                display: flex;
+            #landscape-warning {
+                display: flex !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- ROTATION OVERLAY -->
-    <div id="rotate-overlay">
-        <div class="rotate-icon">🔄</div>
-        <div class="rotate-message">Please Rotate Your Device</div>
-        <div class="rotate-instruction">
-            This game is optimized for landscape mode. Please rotate your device to play.
-        </div>
+    <!-- Fullscreen overlay -->
+    <div id="fullscreen-overlay">
+        <h1>🎮 Mobile Battle Royale</h1>
+        <p style="margin-bottom: 20px; font-size: 16px; max-width: 400px;">
+            A turn-based tactical combat game for mobile devices.<br>
+            For best experience, enable fullscreen mode.
+        </p>
+        <button id="fullscreen-btn" onclick="enterFullscreen()">
+            <span>📱</span> Enter Fullscreen
+        </button>
+        <p style="margin-top: 20px; font-size: 14px; color: #95a5a6;">
+            If fullscreen doesn't work, the game will still function.<br>
+            Make sure your device is in landscape mode.
+        </p>
     </div>
 
-    <!-- GAME CONTAINER -->
+    <!-- Landscape warning -->
+    <div id="landscape-warning">
+        <h1>🔄 Please Rotate Your Device</h1>
+        <div class="rotate-icon">📱</div>
+        <p>This game is optimized for landscape mode.<br>Please rotate your device to play.</p>
+        <p><small>If rotation doesn't work, check your device's orientation lock.</small></p>
+    </div>
+
+    <!-- Main game container -->
     <div id="game-container">
-        <!-- TOP BAR -->
-        <div id="top-bar">
-            <div class="player-display">
-                <div class="player-avatar" id="player-avatar">🧍‍♂️</div>
-                <div class="player-info">
-                    <h3 id="player-name">Player 1</h3>
-                    <p id="player-status">Turn: Roll Dice</p>
+        <!-- Status indicator -->
+        <div id="status-indicator" class="status-indicator" style="display: none;"></div>
+        
+        <div class="game-layout">
+            <!-- Left controls -->
+            <div id="left-controls">
+                <!-- Mini info -->
+                <div class="mini-info">
+                    <div class="current-player" id="mini-player">P1</div>
+                    <div class="moves-info" id="mini-moves">Roll dice!</div>
                 </div>
+                
+                <!-- Action buttons -->
+                <button class="action-btn roll" onclick="rollDice()">
+                    <span class="icon">🎲</span>
+                    <span>Roll Dice</span>
+                </button>
+                <button class="action-btn aim" onclick="enterAim()">
+                    <span class="icon">🎯</span>
+                    <span>Aim</span>
+                </button>
+                <button class="action-btn shoot" onclick="shoot()">
+                    <span class="icon">🔫</span>
+                    <span>Shoot</span>
+                </button>
+                <button class="action-btn end" onclick="endTurn()">
+                    <span class="icon">⏭️</span>
+                    <span>End Turn</span>
+                </button>
+                
+                <!-- Extra buttons -->
+                <button class="action-btn info" onclick="showPlayerInfo()">
+                    <span class="icon">👤</span>
+                    <span>Players</span>
+                </button>
+                <button class="action-btn rules" onclick="showRules()">
+                    <span class="icon">📖</span>
+                    <span>Rules</span>
+                </button>
             </div>
-            
-            <div class="health-display">
-                <div class="health-bar">
-                    <div id="health-fill" class="health-fill" style="width: 100%; background: #2a9d8f;"></div>
-                </div>
-                <div class="health-text" id="health-text">100</div>
-            </div>
-        </div>
 
-        <!-- MAIN GAME AREA -->
-        <div id="game-area">
-            <!-- GAME BOARD -->
-            <div id="board-container">
-                <div id="board-header">BATTLE ROYALE ARENA</div>
-                <div id="board-wrapper">
-                    <canvas id="game-board"></canvas>
+            <!-- Center game area -->
+            <div id="center-game">
+                <!-- Canvas container -->
+                <div id="canvas-container">
+                    <canvas id="gameCanvas"></canvas>
                     <div id="aim-overlay"></div>
+                    <div id="shotgun-preview"></div>
                 </div>
             </div>
 
-            <!-- SIDEBAR -->
-            <div id="sidebar">
-                <!-- WEAPON PANEL -->
-                <div class="panel compact">
-                    <div class="panel-title">🎯 WEAPON</div>
-                    <div class="weapon-display">
-                        <div class="weapon-icon" id="weapon-icon">🔫</div>
-                        <div class="weapon-info">
-                            <div class="weapon-name" id="weapon-name">Pistol</div>
-                            <div class="weapon-stats" id="weapon-stats">Dmg: 15 | Range: 5</div>
-                        </div>
-                    </div>
-                    <div id="aim-info" style="color: #ffba08; font-size: 11px; display: none;">
-                        🎯 AIM MODE: Move pad to aim
-                    </div>
+            <!-- Right controls -->
+            <div id="right-controls">
+                <!-- Weapon info -->
+                <div class="weapon-info">
+                    <div class="weapon-name" id="mini-weapon">Pistol</div>
+                    <div id="mini-range">Range: 4</div>
+                    <div id="mini-damage">Dmg: 20</div>
                 </div>
-
-                <!-- STATUS PANEL -->
-                <div class="panel compact">
-                    <div class="panel-title">📊 STATUS</div>
-                    <div class="status-grid">
-                        <div class="status-item">
-                            <div class="status-label">Moves</div>
-                            <div class="status-value" id="status-moves">0</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-label">Armor</div>
-                            <div class="status-value" id="status-armor">None</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-label">Gear</div>
-                            <div class="status-value" id="status-gear">-</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-label">Mode</div>
-                            <div class="status-value" id="status-mode">Idle</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PLAYERS PANEL -->
-                <div class="panel compact">
-                    <div class="panel-title">👥 PLAYERS</div>
-                    <div id="players-list">
-                        <!-- Players will be added here -->
-                    </div>
+                
+                <!-- Movement D-pad -->
+                <div id="movement-controls">
+                    <button class="movement-btn up" onpointerdown="startMove(0, -1)" onpointerup="stopMove()">↑</button>
+                    <button class="movement-btn left" onpointerdown="startMove(-1, 0)" onpointerup="stopMove()">←</button>
+                    <button class="movement-btn right" onpointerdown="startMove(1, 0)" onpointerup="stopMove()">→</button>
+                    <button class="movement-btn down" onpointerdown="startMove(0, 1)" onpointerup="stopMove()">↓</button>
                 </div>
             </div>
         </div>
 
-        <!-- GAMEPAD CONTROLS - ALWAYS VISIBLE -->
-        <div id="gamepad-container">
-            <div class="movement-controls">
-                <div class="movement-pad">
-                    <div></div>
-                    <button class="move-btn" data-direction="up">↑</button>
-                    <div></div>
-                    <button class="move-btn" data-direction="left">←</button>
-                    <div></div>
-                    <button class="move-btn" data-direction="right">→</button>
-                    <div></div>
-                    <button class="move-btn" data-direction="down">↓</button>
-                    <div></div>
+        <!-- Panels -->
+        <div id="player-info-panel" class="panel">
+            <div class="panel-content">
+                <div class="panel-header">
+                    <h2>👥 Player Information</h2>
+                    <button class="close-btn" onclick="hidePlayerInfo()">✕</button>
+                </div>
+                <div class="players-list" id="players-info"></div>
+            </div>
+        </div>
+
+        <div id="rules-panel" class="panel">
+            <div class="panel-content">
+                <div class="panel-header">
+                    <h2>📖 Game Rules</h2>
+                    <button class="close-btn" onclick="hideRules()">✕</button>
+                </div>
+                <div id="rules-content" style="flex: 1; overflow-y: auto; padding-right: 5px; font-size: 13px;">
+                    <div style="background: rgba(52,73,94,0.5); border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+                        <h3 style="color: #3498db; margin-bottom: 8px;">🎯 How to Play</h3>
+                        <ul style="padding-left: 20px;">
+                            <li><strong>Roll Dice</strong> to get movement points (2-12)</li>
+                            <li><strong>Move</strong> your character with the D-pad</li>
+                            <li><strong>Aim</strong> at opponents (starts from your position)</li>
+                            <li><strong>Shoot</strong> when ready to attack</li>
+                            <li><strong>End Turn</strong> when done</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="background: rgba(52,73,94,0.5); border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+                        <h3 style="color: #3498db; margin-bottom: 8px;">🏠 Houses & Items</h3>
+                        <ul style="padding-left: 20px;">
+                            <li>Enter <strong>Houses</strong> for loot and cover</li>
+                            <li>Inside houses: <strong>Infinite movement</strong></li>
+                            <li>Find <strong>Weapons</strong> in crates 📦</li>
+                            <li>Collect <strong>Armor</strong> 🛡️ for damage reduction</li>
+                            <li>Heal with <strong>Food</strong> 🍗🍎🥤</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            
-            <!-- ACTION BUTTONS - NOW VISIBLE -->
-            <div class="action-buttons">
-                <button id="btn-roll" class="action-btn">
-                    <span>🎲</span>
-                    ROLL
-                </button>
-                <button id="btn-aim" class="action-btn combat">
-                    <span>🎯</span>
-                    AIM
-                </button>
-                <button id="btn-shoot" class="action-btn combat">
-                    <span>🔥</span>
-                    SHOOT
-                </button>
-                <button id="btn-end" class="action-btn special">
-                    <span>⏭️</span>
-                    END
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- WELCOME MODAL -->
-    <div id="welcome-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-title">🎮 MOBILE BATTLE ROYALE</div>
-            <div class="modal-message">
-                <p>Last player standing wins!</p>
-                <p>4 players. Turn-based combat. Find weapons. Enter houses. Eliminate enemies.</p>
-                <p><strong>How to Play:</strong></p>
-                <p>1. Roll dice to get moves</p>
-                <p>2. Move with pad</p>
-                <p>3. Click AIM, move pad to target</p>
-                <p>4. Click SHOOT to fire</p>
-            </div>
-            <button id="start-game-btn" class="modal-btn">
-                🚀 START GAME
-            </button>
-        </div>
-    </div>
-
-    <!-- HOUSE MODAL -->
-    <div id="house-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-title">🏠 HOUSE ENTERED!</div>
-            <div class="modal-message">
-                <p>You entered a house!</p>
-                <p>• Move freely inside</p>
-                <p>• Find food and items</p>
-                <p>• Use furniture for cover</p>
-                <p>• Exit via door tile (🚪)</p>
-            </div>
-            <button id="enter-house-btn" class="modal-btn">
-                🚪 CONTINUE
-            </button>
         </div>
     </div>
 
     <script>
-        // Mobile Battle Royale Game
-        class BattleRoyaleGame {
+        // Global game instance
+        let game = null;
+
+        // Fullscreen functionality
+        async function enterFullscreen() {
+            const elem = document.documentElement;
+            
+            try {
+                // Try different fullscreen methods
+                if (elem.requestFullscreen) {
+                    await elem.requestFullscreen();
+                } else if (elem.mozRequestFullScreen) { /* Firefox */
+                    await elem.mozRequestFullScreen();
+                } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                    await elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                    await elem.msRequestFullscreen();
+                }
+                
+                // Fullscreen succeeded - hide overlay and show game
+                setTimeout(() => {
+                    document.getElementById('fullscreen-overlay').style.display = 'none';
+                    checkOrientation();
+                    initGame();
+                }, 200);
+                
+            } catch (err) {
+                // Fullscreen failed or denied - start game anyway
+                console.log('Fullscreen not available or denied:', err);
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                checkOrientation();
+                initGame();
+            }
+        }
+
+        // Exit fullscreen (for debugging)
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // Check orientation
+        function checkOrientation() {
+            const warning = document.getElementById('landscape-warning');
+            const gameContainer = document.getElementById('game-container');
+            
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            if (isLandscape || !isMobile) {
+                warning.style.display = 'none';
+                gameContainer.style.display = 'block';
+                if (game) game.handleResize();
+            } else {
+                warning.style.display = 'flex';
+                gameContainer.style.display = 'none';
+            }
+        }
+
+        // Game class
+        class MobileBattleRoyale {
             constructor() {
-                // Game configuration
-                this.GRID_SIZE = 10;
+                // Core grid constants
+                this.GRID_SIZE = 15;
+                this.INDOOR_SIZE = 8;
                 this.TILE_SIZE = 0;
-                this.PLAYER_COUNT = 4;
+                this.CANVAS_SIZE = 0;
+                
+                // Game elements
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.aimOverlay = document.getElementById('aim-overlay');
+                this.shotgunPreview = document.getElementById('shotgun-preview');
+                this.statusIndicator = document.getElementById('status-indicator');
+                this.canvasContainer = document.getElementById('canvas-container');
+                
+                // Mini info elements
+                this.miniPlayer = document.getElementById('mini-player');
+                this.miniMoves = document.getElementById('mini-moves');
+                this.miniWeapon = document.getElementById('mini-weapon');
+                this.miniRange = document.getElementById('mini-range');
+                this.miniDamage = document.getElementById('mini-damage');
                 
                 // Game state
+                this.gameActive = true;
                 this.currentPlayer = 0;
                 this.movesLeft = 0;
-                this.hasShot = false;
                 this.hasRolled = false;
-                this.gameActive = false;
+                this.hasShot = false;
+                this.aiming = false;
                 this.isIndoor = false;
                 this.currentHouse = null;
-                this.aiming = false;
-                this.aim = { x: 0, y: 0 };
-                this.aimDirection = null;
-                this.aimSteps = 0;
                 
-                // Game objects
-                this.map = [];
-                this.houses = [];
-                this.players = [];
-                this.weapons = {};
-                this.gear = {};
+                // Movement interval
+                this.moveInterval = null;
+                this.moveDirection = { dx: 0, dy: 0 };
                 
-                // DOM elements
-                this.canvas = null;
-                this.ctx = null;
+                // Aim state
+                this.aim = {
+                    x: null,
+                    y: null,
+                    dx: null,
+                    dy: null,
+                    steps: 0
+                };
                 
                 // Initialize
-                this.init();
+                this.initPlayers();
+                this.initMap();
+                this.initWeapons();
+                this.initGear();
+                
+                // Setup canvas
+                this.setupCanvas();
+                this.updateUI();
+                this.draw();
             }
             
-            init() {
-                // Check orientation first
-                this.checkOrientation();
+            setupCanvas() {
+                // Get container dimensions
+                const container = this.canvasContainer;
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
                 
-                // Initialize game systems
-                this.initGameData();
-                this.initDOM();
-                this.initCanvas();
-                this.initControls();
-                this.initModals();
+                // Calculate tile size based on available space
+                const maxTileSizeByWidth = Math.floor(containerWidth / this.GRID_SIZE);
+                const maxTileSizeByHeight = Math.floor(containerHeight / this.GRID_SIZE);
+                this.TILE_SIZE = Math.min(maxTileSizeByWidth, maxTileSizeByHeight);
                 
-                // Start orientation monitoring
-                this.startOrientationMonitor();
+                // Ensure minimum visibility
+                this.TILE_SIZE = Math.max(this.TILE_SIZE, 25);
                 
-                // Show welcome modal
-                setTimeout(() => {
-                    document.getElementById('welcome-modal').style.display = 'flex';
-                }, 500);
+                // Calculate canvas size
+                this.CANVAS_SIZE = this.GRID_SIZE * this.TILE_SIZE;
+                
+                // Set canvas dimensions
+                this.canvas.width = this.CANVAS_SIZE;
+                this.canvas.height = this.CANVAS_SIZE;
+                
+                // Setup context
+                this.ctx.imageSmoothingEnabled = false;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
             }
             
-            checkOrientation() {
-                const isPortrait = window.innerHeight > window.innerWidth;
-                const rotateOverlay = document.getElementById('rotate-overlay');
-                const gameContainer = document.getElementById('game-container');
+            handleResize() {
+                // Update canvas size
+                this.setupCanvas();
                 
-                if (isPortrait) {
-                    rotateOverlay.style.display = 'flex';
-                    gameContainer.style.display = 'none';
-                } else {
-                    rotateOverlay.style.display = 'none';
-                    gameContainer.style.display = 'flex';
-                }
-            }
-            
-            startOrientationMonitor() {
-                window.addEventListener('resize', () => this.checkOrientation());
-                window.addEventListener('orientationchange', () => {
-                    setTimeout(() => this.checkOrientation(), 100);
-                });
-            }
-            
-            initGameData() {
-                // Initialize weapons
-                this.weapons = {
-                    pistol: { name: 'Pistol', damage: 15, range: 5, type: 'linear', emoji: '🔫' },
-                    rifle: { name: 'Rifle', damage: 25, range: 7, type: 'linear', emoji: '🔫' },
-                    shotgun: { name: 'Shotgun', damage: 30, range: 3, type: 'spread', emoji: '🔫' },
-                    sniper: { name: 'Sniper', damage: 40, range: 8, type: 'linear', emoji: '🎯' }
-                };
+                // Center canvas perfectly in container
+                const container = this.canvasContainer;
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
                 
-                // Initialize gear
-                this.gear = {
-                    armor: { name: 'Armor', emoji: '🛡️', effect: 'reduce', value: 0.3 },
-                    boots: { name: 'Boots', emoji: '👟', effect: 'move', value: 2 },
-                    scope: { name: 'Scope', emoji: '🔭', effect: 'range', value: 2 }
-                };
-            }
-            
-            initDOM() {
-                // Cache DOM elements
-                this.elements = {
-                    playerAvatar: document.getElementById('player-avatar'),
-                    playerName: document.getElementById('player-name'),
-                    playerStatus: document.getElementById('player-status'),
-                    healthFill: document.getElementById('health-fill'),
-                    healthText: document.getElementById('health-text'),
-                    weaponIcon: document.getElementById('weapon-icon'),
-                    weaponName: document.getElementById('weapon-name'),
-                    weaponStats: document.getElementById('weapon-stats'),
-                    statusMoves: document.getElementById('status-moves'),
-                    statusArmor: document.getElementById('status-armor'),
-                    statusGear: document.getElementById('status-gear'),
-                    statusMode: document.getElementById('status-mode'),
-                    playersList: document.getElementById('players-list'),
-                    aimInfo: document.getElementById('aim-info')
-                };
-            }
-            
-            initCanvas() {
-                this.canvas = document.getElementById('game-board');
-                this.ctx = this.canvas.getContext('2d');
+                // Calculate exact center position
+                const centerX = (containerWidth - this.CANVAS_SIZE) / 2;
+                const centerY = (containerHeight - this.CANVAS_SIZE) / 2;
                 
-                // Set initial canvas size
-                this.resizeCanvas();
+                // Apply centering with pixel-perfect positioning
+                this.canvas.style.position = 'absolute';
+                this.canvas.style.left = `${Math.max(0, centerX)}px`;
+                this.canvas.style.top = `${Math.max(0, centerY)}px`;
                 
-                // Handle resize
-                window.addEventListener('resize', () => this.resizeCanvas());
-            }
-            
-            resizeCanvas() {
-                const wrapper = document.getElementById('board-wrapper');
-                const size = Math.min(wrapper.clientWidth, wrapper.clientHeight);
+                // Update overlays to match exactly
+                this.aimOverlay.style.position = 'absolute';
+                this.aimOverlay.style.left = `${Math.max(0, centerX)}px`;
+                this.aimOverlay.style.top = `${Math.max(0, centerY)}px`;
+                this.aimOverlay.style.width = `${this.CANVAS_SIZE}px`;
+                this.aimOverlay.style.height = `${this.CANVAS_SIZE}px`;
                 
-                this.canvas.width = size;
-                this.canvas.height = size;
-                this.TILE_SIZE = Math.floor(size / this.GRID_SIZE);
+                this.shotgunPreview.style.position = 'absolute';
+                this.shotgunPreview.style.left = `${Math.max(0, centerX)}px`;
+                this.shotgunPreview.style.top = `${Math.max(0, centerY)}px`;
+                this.shotgunPreview.style.width = `${this.CANVAS_SIZE}px`;
+                this.shotgunPreview.style.height = `${this.CANVAS_SIZE}px`;
                 
-                console.log(`Canvas resized: ${size}x${size}, Tile: ${this.TILE_SIZE}px`);
-                
-                // Redraw if game is active
+                // Redraw
                 if (this.gameActive) {
                     this.draw();
                     if (this.aiming) {
-                        this.updateAimDisplay();
+                        this.updateAimCursor();
                     }
                 }
             }
             
-            initControls() {
-                // Movement buttons
-                document.querySelectorAll('.move-btn').forEach(btn => {
-                    btn.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        const direction = btn.dataset.direction;
-                        this.handleMovementOrAim(direction);
-                        this.showTouchFeedback(e);
-                    });
-                    
-                    btn.addEventListener('click', (e) => {
-                        const direction = btn.dataset.direction;
-                        this.handleMovementOrAim(direction);
-                    });
-                });
-                
-                // Action buttons
-                document.getElementById('btn-roll').addEventListener('click', () => this.rollDice());
-                document.getElementById('btn-aim').addEventListener('click', () => this.toggleAim());
-                document.getElementById('btn-shoot').addEventListener('click', () => this.shoot());
-                document.getElementById('btn-end').addEventListener('click', () => this.endTurn());
-            }
-            
-            initModals() {
-                document.getElementById('start-game-btn').addEventListener('click', () => {
-                    document.getElementById('welcome-modal').style.display = 'none';
-                    this.startNewGame();
-                });
-                
-                document.getElementById('enter-house-btn').addEventListener('click', () => {
-                    document.getElementById('house-modal').classList.add('hidden');
-                });
-            }
-            
-            handleMovementOrAim(direction) {
-                if (!this.gameActive) return;
-                
-                if (this.aiming) {
-                    this.moveAim(direction);
-                } else {
-                    this.handleMovement(direction);
-                }
-            }
-            
-            handleMovement(direction) {
-                const player = this.players[this.currentPlayer];
-                
-                // Check if can move
-                if (!this.isIndoor && this.movesLeft <= 0) {
-                    if (!this.hasRolled) {
-                        this.showMessage('Roll dice first!');
+            initPlayers() {
+                this.players = [
+                    {
+                        x: 0, y: 14, hp: 100, maxHp: 100,
+                        weapon: 'pistol', armor: null, gear: [],
+                        alive: true, inHouse: null, indoorPos: null,
+                        emoji: '😎', color: '#3498db'
+                    },
+                    {
+                        x: 0, y: 0, hp: 100, maxHp: 100,
+                        weapon: 'pistol', armor: null, gear: [],
+                        alive: true, inHouse: null, indoorPos: null,
+                        emoji: '🤠', color: '#e74c3c'
+                    },
+                    {
+                        x: 14, y: 0, hp: 100, maxHp: 100,
+                        weapon: 'pistol', armor: null, gear: [],
+                        alive: true, inHouse: null, indoorPos: null,
+                        emoji: '🦹', color: '#2ecc71'
+                    },
+                    {
+                        x: 14, y: 14, hp: 100, maxHp: 100,
+                        weapon: 'pistol', armor: null, gear: [],
+                        alive: true, inHouse: null, indoorPos: null,
+                        emoji: '🧙', color: '#f39c12'
                     }
-                    return;
-                }
-                
-                let dx = 0, dy = 0;
-                switch(direction) {
-                    case 'up': dy = -1; break;
-                    case 'down': dy = 1; break;
-                    case 'left': dx = -1; break;
-                    case 'right': dx = 1; break;
-                }
-                
-                if (this.isIndoor) {
-                    this.moveIndoor(player, dx, dy);
-                } else {
-                    this.moveOutdoor(player, dx, dy);
-                }
+                ];
             }
             
-            moveOutdoor(player, dx, dy) {
-                const newX = player.x + dx;
-                const newY = player.y + dy;
-                
-                // Check bounds
-                if (newX < 0 || newY < 0 || newX >= this.GRID_SIZE || newY >= this.GRID_SIZE) {
-                    return;
-                }
-                
-                // Check tile
-                const tile = this.map[newY][newX];
-                if (!tile) {
-                    // Empty tile
-                    player.x = newX;
-                    player.y = newY;
-                    if (!this.isIndoor) this.movesLeft--;
-                    this.draw();
-                } else if (tile.blocks) {
-                    // Blocked by obstacle
-                    return;
-                } else if (tile.house) {
-                    // Enter house
-                    this.enterHouse(player, newX, newY);
-                    return;
-                } else if (tile.item) {
-                    // Pick up item
-                    player.x = newX;
-                    player.y = newY;
-                    this.map[newY][newX] = null;
-                    this.pickupItem();
-                    if (!this.isIndoor) this.movesLeft--;
-                    this.draw();
-                }
-                
-                this.updateUI();
-            }
-            
-            moveIndoor(player, dx, dy) {
-                if (!player.indoorPos) return;
-                
-                const house = this.currentHouse;
-                const newX = player.indoorPos.x + dx;
-                const newY = player.indoorPos.y + dy;
-                
-                // Check bounds (indoor map is 5x5)
-                if (newX < 0 || newY < 0 || newX >= 5 || newY >= 5) {
-                    return;
-                }
-                
-                // Check tile
-                const tile = house.indoorMap[newY][newX];
-                if (!tile) {
-                    player.indoorPos.x = newX;
-                    player.indoorPos.y = newY;
-                    this.drawIndoor();
-                } else if (tile.door) {
-                    this.exitHouse(player);
-                    return;
-                } else if (tile.blocks) {
-                    return;
-                }
-                
-                this.updateUI();
-            }
-            
-            moveAim(direction) {
-                const player = this.players[this.currentPlayer];
-                const weapon = this.weapons[player.weapon];
-                
-                // Calculate max range (with scope bonus)
-                let maxRange = weapon.range;
-                player.gear.forEach(g => {
-                    if (g.effect === 'range') maxRange += g.value;
-                });
-                
-                // Set direction on first move
-                if (this.aimDirection === null) {
-                    this.aimDirection = direction;
-                }
-                
-                // Can only move in chosen direction
-                if (direction !== this.aimDirection) {
-                    this.showMessage('Can only aim in one direction!');
-                    return;
-                }
-                
-                // Check if reached max range
-                if (this.aimSteps >= maxRange) {
-                    this.showMessage(`Max range (${maxRange}) reached!`);
-                    return;
-                }
-                
-                let dx = 0, dy = 0;
-                switch(direction) {
-                    case 'up': dy = -1; break;
-                    case 'down': dy = 1; break;
-                    case 'left': dx = -1; break;
-                    case 'right': dx = 1; break;
-                }
-                
-                const newX = this.aim.x + dx;
-                const newY = this.aim.y + dy;
-                
-                // Check bounds
-                let maxX, maxY;
-                if (this.isIndoor) {
-                    maxX = maxY = 5;
-                } else {
-                    maxX = maxY = this.GRID_SIZE;
-                }
-                
-                if (newX < 0 || newY < 0 || newX >= maxX || newY >= maxY) {
-                    this.showMessage('Cannot aim outside map!');
-                    return;
-                }
-                
-                // Update aim position
-                this.aim.x = newX;
-                this.aim.y = newY;
-                this.aimSteps++;
-                
-                this.updateAimDisplay();
-                this.showMessage(`Aiming at (${this.aim.x}, ${this.aim.y}) - ${maxRange - this.aimSteps} range left`);
-            }
-            
-            startNewGame() {
-                // Reset game state
-                this.currentPlayer = 0;
-                this.movesLeft = 0;
-                this.hasShot = false;
-                this.hasRolled = false;
-                this.gameActive = true;
-                this.isIndoor = false;
-                this.currentHouse = null;
-                this.aiming = false;
-                this.aimDirection = null;
-                this.aimSteps = 0;
-                
-                // Generate map
-                this.generateMap();
-                
-                // Initialize players
-                this.initPlayers();
-                
-                // Draw initial state
-                this.draw();
-                this.updateUI();
-                
-                // Show initial message
-                this.showMessage('Game started! Player 1 begins. Roll dice to move.');
-            }
-            
-            generateMap() {
+            initMap() {
                 this.map = [];
                 this.houses = [];
                 
-                // Create empty grid
+                // Create 15x15 grid with cleared corners
                 for (let y = 0; y < this.GRID_SIZE; y++) {
                     this.map[y] = [];
                     for (let x = 0; x < this.GRID_SIZE; x++) {
-                        this.map[y][x] = null;
-                    }
-                }
-                
-                // Add obstacles (20% of tiles)
-                for (let y = 0; y < this.GRID_SIZE; y++) {
-                    for (let x = 0; x < this.GRID_SIZE; x++) {
-                        // Skip player starting positions
-                        if ((x === 0 && y === this.GRID_SIZE-1) ||
-                            (x === 0 && y === 0) ||
-                            (x === this.GRID_SIZE-1 && y === 0) ||
-                            (x === this.GRID_SIZE-1 && y === this.GRID_SIZE-1)) {
-                            continue;
-                        }
-                        
                         const r = Math.random();
-                        if (r < 0.15) {
+                        
+                        if (r < 0.08) {
                             this.map[y][x] = { type: '🌳', blocks: true, cover: true };
-                        } else if (r < 0.18) {
+                        } else if (r < 0.14) {
+                            this.map[y][x] = { type: '🪨', blocks: true, cover: true };
+                        } else if (r < 0.16) {
                             this.map[y][x] = { type: '🏠', blocks: false, house: true };
                             this.houses.push({
-                                x, y,
+                                x: x, y: y,
+                                entranceX: x, entranceY: y,
                                 indoorMap: this.createIndoorMap(),
                                 playersInside: []
                             });
-                        } else if (r < 0.22) {
+                        } else if (r < 0.20) {
                             this.map[y][x] = { type: '📦', blocks: false, item: true };
+                        } else {
+                            this.map[y][x] = null;
                         }
                     }
                 }
+                
+                // Clear spawn corners and surrounding area
+                const corners = [[0,14], [0,0], [14,0], [14,14]];
+                corners.forEach(([x,y]) => {
+                    // Clear 2x2 area for each spawn point
+                    for (let dx = -1; dx <= 1; dx++) {
+                        for (let dy = -1; dy <= 1; dy++) {
+                            const nx = x + dx;
+                            const ny = y + dy;
+                            if (nx >= 0 && nx < this.GRID_SIZE && ny >= 0 && ny < this.GRID_SIZE) {
+                                this.map[ny][nx] = null;
+                            }
+                        }
+                    }
+                });
             }
             
             createIndoorMap() {
-                const size = 5;
+                const indoorSize = 8;
                 const indoorMap = [];
                 
-                // Create walls
-                for (let y = 0; y < size; y++) {
+                for (let y = 0; y < indoorSize; y++) {
                     indoorMap[y] = [];
-                    for (let x = 0; x < size; x++) {
-                        if (x === 0 || y === 0 || x === size-1 || y === size-1) {
-                            // Door in middle of bottom wall
-                            if (x === Math.floor(size/2) && y === size-1) {
-                                indoorMap[y][x] = { type: '🚪', blocks: false, door: true };
-                            } else {
-                                indoorMap[y][x] = { type: '🧱', blocks: true };
-                            }
-                        } else {
-                            indoorMap[y][x] = null;
+                    for (let x = 0; x < indoorSize; x++) {
+                        indoorMap[y][x] = null;
+                    }
+                }
+                
+                // Place door
+                const doorX = Math.floor(indoorSize / 2) - 1;
+                const doorY = indoorSize - 1;
+                indoorMap[doorY][doorX] = { type: '🚪', blocks: false, door: true };
+                
+                // Walls
+                for (let y = 0; y < indoorSize; y++) {
+                    for (let x = 0; x < indoorSize; x++) {
+                        if (x === 0 || y === 0 || x === indoorSize-1 || y === indoorSize-1) {
+                            if (x === doorX && y === doorY) continue;
+                            indoorMap[y][x] = { type: '🧱', blocks: true };
                         }
                     }
                 }
                 
-                // Add some furniture
-                const furniture = ['🛋️', '🪑'];
-                for (let i = 0; i < 3; i++) {
-                    const x = Math.floor(Math.random() * (size-2)) + 1;
-                    const y = Math.floor(Math.random() * (size-2)) + 1;
-                    // Don't block door area
-                    if (!(x === Math.floor(size/2) && y >= size-2)) {
-                        indoorMap[y][x] = { type: furniture[Math.floor(Math.random() * furniture.length)], blocks: true };
+                // Furniture and items
+                const furniture = ['🛋️', '📺', '🪑', '🛏️'];
+                const foodItems = ['🍎', '🍗', '🥤'];
+                
+                for (let y = 1; y < indoorSize - 1; y++) {
+                    for (let x = 1; x < indoorSize - 1; x++) {
+                        if (x >= doorX-1 && x <= doorX+1 && y >= doorY-1) continue;
+                        
+                        const r = Math.random();
+                        if (r < 0.25) {
+                            indoorMap[y][x] = { 
+                                type: furniture[Math.floor(Math.random()*furniture.length)], 
+                                blocks: true 
+                            };
+                        } else if (r < 0.28) {
+                            const food = foodItems[Math.floor(Math.random()*foodItems.length)];
+                            indoorMap[y][x] = { 
+                                type: food, 
+                                blocks: false, 
+                                food: true,
+                                healAmount: { '🍎':15, '🍗':25, '🥤':20 }[food]
+                            };
+                        } else if (r < 0.33) {
+                            indoorMap[y][x] = { type: '📦', blocks: false, item: true };
+                        }
                     }
                 }
                 
                 return indoorMap;
             }
             
-            initPlayers() {
-                this.players = [
-                    { 
-                        x: 0, y: this.GRID_SIZE-1, 
-                        hp: 100, maxHp: 100,
-                        weapon: 'pistol',
-                        emoji: '🧍‍♂️',
-                        alive: true,
-                        gear: [],
-                        inHouse: null,
-                        indoorPos: null
-                    },
-                    { 
-                        x: 0, y: 0, 
-                        hp: 100, maxHp: 100,
-                        weapon: 'pistol',
-                        emoji: '🧍‍♀️',
-                        alive: true,
-                        gear: [],
-                        inHouse: null,
-                        indoorPos: null
-                    },
-                    { 
-                        x: this.GRID_SIZE-1, y: 0, 
-                        hp: 100, maxHp: 100,
-                        weapon: 'pistol',
-                        emoji: '🧑',
-                        alive: true,
-                        gear: [],
-                        inHouse: null,
-                        indoorPos: null
-                    },
-                    { 
-                        x: this.GRID_SIZE-1, y: this.GRID_SIZE-1, 
-                        hp: 100, maxHp: 100,
-                        weapon: 'pistol',
-                        emoji: '🧔',
-                        alive: true,
-                        gear: [],
-                        inHouse: null,
-                        indoorPos: null
-                    }
-                ];
+            initWeapons() {
+                this.weapons = {
+                    pistol: { name: 'Pistol', damage: 20, range: 4, emoji: '🔫', type: 'linear' },
+                    rifle: { name: 'Rifle', damage: 30, range: 8, emoji: '🎯', type: 'linear' },
+                    shotgun: { name: 'Shotgun', damage: 40, range: 2, emoji: '🔫', type: 'shotgun' },
+                    smg: { name: 'SMG', damage: 15, range: 3, emoji: '🔫', type: 'rapid' },
+                    flamethrower: { name: 'Flamethrower', damage: 25, range: 2, emoji: '🔥', type: 'flame' },
+                    sniper: { name: 'Sniper', damage: 50, range: 12, emoji: '🎯', type: 'linear' }
+                };
             }
             
-            enterHouse(player, houseX, houseY) {
-                const house = this.houses.find(h => h.x === houseX && h.y === houseY);
-                if (!house) return;
-                
-                // Find door position
-                let doorX = 2, doorY = 4; // Center bottom of 5x5
-                
-                player.indoorPos = { x: doorX, y: doorY };
-                house.playersInside.push(this.players.indexOf(player));
-                this.currentHouse = house;
-                this.isIndoor = true;
-                
-                // Show house modal
-                document.getElementById('house-modal').classList.remove('hidden');
-                
-                this.drawIndoor();
-                this.updateUI();
-                this.showMessage('Entered house! Move freely inside.');
+            initGear() {
+                this.gearTypes = {
+                    armor: { name: 'Body Armor', effect: 'damageReduction', value: 0.3, emoji: '🛡️' },
+                    scope: { name: 'Scope', effect: 'rangeBonus', value: 2, emoji: '🔭' },
+                    medkit: { name: 'Medkit', effect: 'heal', value: 30, emoji: '💊' }
+                };
             }
             
-            exitHouse(player) {
-                const house = this.currentHouse;
-                const playerIndex = this.players.indexOf(player);
-                const houseIndex = house.playersInside.indexOf(playerIndex);
+            draw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                if (houseIndex > -1) {
-                    house.playersInside.splice(houseIndex, 1);
-                }
-                
-                player.indoorPos = null;
-                this.isIndoor = false;
-                this.currentHouse = null;
-                
-                this.draw();
-                this.updateUI();
-                this.showMessage('Exited house.');
-            }
-            
-            pickupItem() {
-                const player = this.players[this.currentPlayer];
-                const r = Math.random();
-                
-                if (r < 0.7) {
-                    // Weapon
-                    const weapons = Object.keys(this.weapons).filter(w => w !== player.weapon);
-                    if (weapons.length > 0) {
-                        const newWeapon = weapons[Math.floor(Math.random() * weapons.length)];
-                        player.weapon = newWeapon;
-                        this.showMessage(`Found ${this.weapons[newWeapon].name}!`);
-                    }
+                if (this.isIndoor && this.currentHouse) {
+                    this.drawIndoor();
                 } else {
-                    // Gear
-                    const gearTypes = Object.keys(this.gear);
-                    const newGear = gearTypes[Math.floor(Math.random() * gearTypes.length)];
-                    player.gear.push(this.gear[newGear]);
-                    this.showMessage(`Found ${this.gear[newGear].emoji} ${this.gear[newGear].name}!`);
+                    this.drawOutdoor();
                 }
-                
-                this.updateUI();
             }
             
-            rollDice() {
-                if (this.hasRolled || this.isIndoor) return;
+            drawOutdoor() {
+                // Draw background
+                this.ctx.fillStyle = '#2e7d32';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                const dice1 = Math.floor(Math.random() * 6) + 1;
-                const dice2 = Math.floor(Math.random() * 6) + 1;
-                this.movesLeft = dice1 + dice2;
-                this.hasRolled = true;
-                
-                // Apply boots bonus
-                const player = this.players[this.currentPlayer];
-                player.gear.forEach(g => {
-                    if (g.effect === 'move') {
-                        this.movesLeft += g.value;
+                // Draw grid
+                for (let y = 0; y < this.GRID_SIZE; y++) {
+                    for (let x = 0; x < this.GRID_SIZE; x++) {
+                        const tile = this.map[y][x];
+                        const screenX = x * this.TILE_SIZE;
+                        const screenY = y * this.TILE_SIZE;
+                        
+                        // Grid lines
+                        this.ctx.strokeStyle = '#3a7d44';
+                        this.ctx.lineWidth = 1;
+                        this.ctx.strokeRect(screenX, screenY, this.TILE_SIZE, this.TILE_SIZE);
+                        
+                        if (tile) {
+                            this.ctx.font = `${Math.max(this.TILE_SIZE * 0.5, 12)}px Arial`;
+                            this.ctx.fillText(
+                                tile.type,
+                                screenX + this.TILE_SIZE / 2,
+                                screenY + this.TILE_SIZE / 2
+                            );
+                        }
                     }
+                }
+                
+                // Draw players
+                this.players.forEach((player, index) => {
+                    if (!player.alive || player.inHouse) return;
+                    this.drawPlayer(player, index, player.x, player.y);
                 });
-                
-                this.showMessage(`Rolled ${dice1}+${dice2}=${this.movesLeft} moves!`);
-                this.updateUI();
             }
             
-            toggleAim() {
-                if (this.hasShot || !this.hasRolled) return;
+            drawIndoor() {
+                if (!this.currentHouse) return;
                 
-                this.aiming = !this.aiming;
+                // Draw floor
+                this.ctx.fillStyle = '#8b4513';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                if (this.aiming) {
-                    const player = this.players[this.currentPlayer];
-                    this.aim = {
-                        x: this.isIndoor ? player.indoorPos.x : player.x,
-                        y: this.isIndoor ? player.indoorPos.y : player.y
-                    };
-                    this.aimDirection = null;
-                    this.aimSteps = 0;
-                    
-                    this.showMessage('AIM MODE: Move pad to aim, then SHOOT');
-                    this.elements.aimInfo.style.display = 'block';
-                    this.updateAimDisplay();
-                } else {
-                    this.clearAim();
-                    this.showMessage('Aim cancelled');
-                    this.elements.aimInfo.style.display = 'none';
+                const indoorSize = 8;
+                const offsetX = (this.GRID_SIZE - indoorSize) * this.TILE_SIZE / 2;
+                const offsetY = (this.GRID_SIZE - indoorSize) * this.TILE_SIZE / 2;
+                
+                // Draw indoor grid
+                for (let y = 0; y < indoorSize; y++) {
+                    for (let x = 0; x < indoorSize; x++) {
+                        const tile = this.currentHouse.indoorMap[y][x];
+                        const screenX = x * this.TILE_SIZE + offsetX;
+                        const screenY = y * this.TILE_SIZE + offsetY;
+                        
+                        this.ctx.strokeStyle = '#a0522d';
+                        this.ctx.lineWidth = 1;
+                        this.ctx.strokeRect(screenX, screenY, this.TILE_SIZE, this.TILE_SIZE);
+                        
+                        if (tile) {
+                            this.ctx.font = `${Math.max(this.TILE_SIZE * 0.5, 12)}px Arial`;
+                            this.ctx.fillText(
+                                tile.type,
+                                screenX + this.TILE_SIZE / 2,
+                                screenY + this.TILE_SIZE / 2
+                            );
+                        }
+                    }
                 }
                 
-                this.updateUI();
+                // Draw indoor players
+                this.players.forEach((player, index) => {
+                    if (!player.alive || player.inHouse !== this.currentHouse) return;
+                    this.drawPlayer(player, index, player.indoorPos.x, player.indoorPos.y, offsetX, offsetY);
+                });
             }
             
-            updateAimDisplay() {
-                const overlay = document.getElementById('aim-overlay');
-                overlay.innerHTML = '';
+            drawPlayer(player, index, gridX, gridY, offsetX = 0, offsetY = 0) {
+                const screenX = gridX * this.TILE_SIZE + offsetX;
+                const screenY = gridY * this.TILE_SIZE + offsetY;
                 
+                // Draw player circle
+                this.ctx.fillStyle = player.color;
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    screenX + this.TILE_SIZE / 2,
+                    screenY + this.TILE_SIZE / 2,
+                    this.TILE_SIZE / 2 - 2,
+                    0,
+                    Math.PI * 2
+                );
+                this.ctx.fill();
+                
+                // Pulsing for current player
+                if (index === this.currentPlayer) {
+                    this.ctx.save();
+                    const pulseScale = 1 + 0.1 * Math.sin(Date.now() / 200);
+                    this.ctx.translate(screenX + this.TILE_SIZE / 2, screenY + this.TILE_SIZE / 2);
+                    this.ctx.scale(pulseScale, pulseScale);
+                    this.ctx.translate(-(screenX + this.TILE_SIZE / 2), -(screenY + this.TILE_SIZE / 2));
+                    this.ctx.shadowColor = player.color;
+                    this.ctx.shadowBlur = 8;
+                }
+                
+                // Player emoji
+                this.ctx.font = `${Math.max(this.TILE_SIZE * 0.5, 12)}px Arial`;
+                this.ctx.fillStyle = '#fff';
+                this.ctx.fillText(
+                    player.emoji,
+                    screenX + this.TILE_SIZE / 2,
+                    screenY + this.TILE_SIZE / 2
+                );
+                
+                if (index === this.currentPlayer) {
+                    this.ctx.restore();
+                }
+                
+                // Health bar
+                const barWidth = this.TILE_SIZE - 4;
+                const barHeight = Math.max(3, this.TILE_SIZE * 0.08);
+                const barX = screenX + 2;
+                const barY = screenY - barHeight - 1;
+                
+                this.ctx.fillStyle = '#333';
+                this.ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                const healthPercent = player.hp / player.maxHp;
+                const healthWidth = healthPercent * barWidth;
+                
+                this.ctx.fillStyle = healthPercent > 0.5 ? '#2ecc71' : 
+                                   healthPercent > 0.25 ? '#f39c12' : '#e74c3c';
+                this.ctx.fillRect(barX, barY, healthWidth, barHeight);
+            }
+            
+            // Game actions
+            rollDice() {
+                if (this.hasRolled || this.aiming) return;
+                
+                const player = this.players[this.currentPlayer];
+                
+                if (player.inHouse) {
+                    this.movesLeft = 99;
+                } else {
+                    this.movesLeft = Math.floor(Math.random() * 6) + 1 + 
+                                    Math.floor(Math.random() * 6) + 1;
+                }
+                
+                this.hasRolled = true;
+                this.updateUI();
+                this.playSound(500);
+                alert(`🎲 Rolled ${this.movesLeft} movement points!`);
+            }
+            
+            startMove(dx, dy) {
+                if (this.aiming) {
+                    this.moveAim(dx, dy);
+                    return;
+                }
+                
+                this.moveDirection = { dx, dy };
+                this.executeMove();
+                
+                clearInterval(this.moveInterval);
+                this.moveInterval = setInterval(() => {
+                    this.executeMove();
+                }, 200);
+            }
+            
+            stopMove() {
+                clearInterval(this.moveInterval);
+                this.moveDirection = { dx: 0, dy: 0 };
+            }
+            
+            executeMove() {
+                if (!this.gameActive || this.aiming) return;
+                
+                const player = this.players[this.currentPlayer];
+                const { dx, dy } = this.moveDirection;
+                
+                if (dx === 0 && dy === 0) return;
+                
+                if (player.inHouse) {
+                    this.movePlayerIndoor(player, dx, dy);
+                } else {
+                    if (!this.hasRolled || this.movesLeft <= 0) return;
+                    this.movePlayerOutdoor(player, dx, dy);
+                }
+            }
+            
+            movePlayerOutdoor(player, dx, dy) {
+                const newX = player.x + dx;
+                const newY = player.y + dy;
+                
+                if (newX < 0 || newY < 0 || newX >= this.GRID_SIZE || newY >= this.GRID_SIZE) {
+                    return;
+                }
+                
+                const tile = this.map[newY][newX];
+                
+                if (!tile) {
+                    const collision = this.players.some(p => 
+                        p.alive && p !== player && !p.inHouse && p.x === newX && p.y === newY);
+                    if (collision) return;
+                    
+                    player.x = newX;
+                    player.y = newY;
+                    if (this.hasRolled) this.movesLeft--;
+                    this.updateUI();
+                    this.draw();
+                    this.playSound(300);
+                    return;
+                }
+                
+                if (tile.blocks) return;
+                
+                if (tile.house) {
+                    this.enterHouse(player, newX, newY);
+                    return;
+                }
+                
+                if (tile.item) {
+                    player.x = newX;
+                    player.y = newY;
+                    if (this.hasRolled) this.movesLeft--;
+                    this.pickupItem(player, newX, newY);
+                    this.updateUI();
+                    this.draw();
+                    this.playSound(600);
+                    return;
+                }
+            }
+            
+            movePlayerIndoor(player, dx, dy) {
+                if (!player.indoorPos) return;
+                
+                const newX = player.indoorPos.x + dx;
+                const newY = player.indoorPos.y + dy;
+                
+                if (newX < 0 || newY < 0 || newX >= 8 || newY >= 8) return;
+                
+                const tile = player.inHouse.indoorMap[newY][newX];
+                
+                if (!tile) {
+                    const collision = this.players.find(p => 
+                        p.alive && p !== player && 
+                        p.inHouse === player.inHouse &&
+                        p.indoorPos && p.indoorPos.x === newX && p.indoorPos.y === newY);
+                    
+                    if (collision) return;
+                    
+                    player.indoorPos.x = newX;
+                    player.indoorPos.y = newY;
+                    this.updateUI();
+                    this.draw();
+                    this.playSound(300);
+                    return;
+                }
+                
+                if (tile.blocks) return;
+                
+                if (tile.door) {
+                    this.exitHouse(player);
+                    return;
+                }
+                
+                if (tile.food) {
+                    player.indoorPos.x = newX;
+                    player.indoorPos.y = newY;
+                    player.hp = Math.min(player.maxHp, player.hp + tile.healAmount);
+                    player.inHouse.indoorMap[newY][newX] = null;
+                    this.updateUI();
+                    this.draw();
+                    this.playSound(700);
+                    alert(`🍗 Healed ${tile.healAmount} HP!`);
+                    return;
+                }
+                
+                if (tile.item) {
+                    player.indoorPos.x = newX;
+                    player.indoorPos.y = newY;
+                    this.pickupItem(player, newX, newY, true);
+                    this.updateUI();
+                    this.draw();
+                    this.playSound(600);
+                    return;
+                }
+            }
+            
+            enterAim() {
+                if (this.hasShot || this.aiming) return;
+                if (!this.hasRolled && !this.players[this.currentPlayer].inHouse) {
+                    alert("You need to roll dice first!");
+                    return;
+                }
+                
+                const player = this.players[this.currentPlayer];
+                
+                if (this.isIndoor && player.indoorPos) {
+                    this.aim = {
+                        x: player.indoorPos.x,
+                        y: player.indoorPos.y,
+                        dx: null,
+                        dy: null,
+                        steps: 0
+                    };
+                } else {
+                    this.aim = {
+                        x: player.x,
+                        y: player.y,
+                        dx: null,
+                        dy: null,
+                        steps: 0
+                    };
+                }
+                
+                this.aiming = true;
+                this.updateAimCursor();
+                this.updateUI();
+                
+                this.statusIndicator.textContent = "🎯 AIMING MODE - Use movement buttons to aim";
+                this.statusIndicator.className = "status-indicator status-aiming";
+                this.statusIndicator.style.display = 'block';
+            }
+            
+            moveAim(dx, dy) {
                 if (!this.aiming) return;
                 
                 const player = this.players[this.currentPlayer];
                 const weapon = this.weapons[player.weapon];
                 
-                // Calculate max range (with scope bonus)
-                let maxRange = weapon.range;
+                let range = weapon.range;
                 player.gear.forEach(g => {
-                    if (g.effect === 'range') maxRange += g.value;
+                    if (g.effect === 'rangeBonus') range += g.value;
                 });
                 
-                // Draw range indicator
-                if (this.aimDirection) {
-                    let startX = this.isIndoor ? player.indoorPos.x : player.x;
-                    let startY = this.isIndoor ? player.indoorPos.y : player.y;
-                    
-                    for (let i = 1; i <= maxRange; i++) {
-                        let x, y;
-                        switch(this.aimDirection) {
-                            case 'up': x = startX; y = startY - i; break;
-                            case 'down': x = startX; y = startY + i; break;
-                            case 'left': x = startX - i; y = startY; break;
-                            case 'right': x = startX + i; y = startY; break;
-                        }
-                        
-                        // Check bounds
-                        let maxCoord = this.isIndoor ? 5 : this.GRID_SIZE;
-                        if (x < 0 || y < 0 || x >= maxCoord || y >= maxCoord) break;
-                        
-                        // Calculate screen position
-                        let screenX, screenY;
-                        if (this.isIndoor) {
-                            const offset = (this.GRID_SIZE - 5) * this.TILE_SIZE / 2;
-                            screenX = x * this.TILE_SIZE + offset;
-                            screenY = y * this.TILE_SIZE + offset;
-                        } else {
-                            screenX = x * this.TILE_SIZE;
-                            screenY = y * this.TILE_SIZE;
-                        }
-                        
-                        const rangeCell = document.createElement('div');
-                        rangeCell.className = 'aim-range';
-                        rangeCell.style.left = screenX + 'px';
-                        rangeCell.style.top = screenY + 'px';
-                        rangeCell.style.width = this.TILE_SIZE + 'px';
-                        rangeCell.style.height = this.TILE_SIZE + 'px';
-                        overlay.appendChild(rangeCell);
-                    }
+                if (this.aim.dx === null && this.aim.dy === null) {
+                    this.aim.dx = dx;
+                    this.aim.dy = dy;
                 }
                 
-                // Draw current aim position
-                let aimX, aimY;
+                if (dx !== this.aim.dx || dy !== this.aim.dy) return;
+                if (this.aim.steps >= range) return;
+                
+                const newX = this.aim.x + dx;
+                const newY = this.aim.y + dy;
+                
+                const maxBound = this.isIndoor ? 8 : this.GRID_SIZE;
+                if (newX < 0 || newY < 0 || newX >= maxBound || newY >= maxBound) return;
+                
                 if (this.isIndoor) {
-                    const offset = (this.GRID_SIZE - 5) * this.TILE_SIZE / 2;
-                    aimX = this.aim.x * this.TILE_SIZE + offset;
-                    aimY = this.aim.y * this.TILE_SIZE + offset;
+                    const tile = this.currentHouse.indoorMap[newY][newX];
+                    if (tile && tile.blocks) return;
                 } else {
-                    aimX = this.aim.x * this.TILE_SIZE;
-                    aimY = this.aim.y * this.TILE_SIZE;
+                    const tile = this.map[newY][newX];
+                    if (tile && tile.blocks) return;
                 }
                 
-                const aimCell = document.createElement('div');
-                aimCell.className = 'aim-cell';
-                aimCell.style.left = aimX + 'px';
-                aimCell.style.top = aimY + 'px';
-                aimCell.style.width = this.TILE_SIZE + 'px';
-                aimCell.style.height = this.TILE_SIZE + 'px';
-                aimCell.style.animation = 'aimPulse 1s infinite';
-                overlay.appendChild(aimCell);
+                this.aim.x = newX;
+                this.aim.y = newY;
+                this.aim.steps++;
+                
+                this.updateAimCursor();
+                this.playSound(400);
             }
             
-            clearAim() {
-                document.getElementById('aim-overlay').innerHTML = '';
+            updateAimCursor() {
+                this.aimOverlay.innerHTML = '';
+                this.shotgunPreview.innerHTML = '';
+                
+                if (!this.aiming) return;
+                
+                let screenX, screenY;
+                
+                if (this.isIndoor) {
+                    const offsetX = (this.GRID_SIZE - 8) * this.TILE_SIZE / 2;
+                    const offsetY = (this.GRID_SIZE - 8) * this.TILE_SIZE / 2;
+                    screenX = this.aim.x * this.TILE_SIZE + offsetX;
+                    screenY = this.aim.y * this.TILE_SIZE + offsetY;
+                } else {
+                    screenX = this.aim.x * this.TILE_SIZE;
+                    screenY = this.aim.y * this.TILE_SIZE;
+                }
+                
+                const cursor = document.createElement('div');
+                cursor.className = 'aim-cell';
+                cursor.style.left = screenX + 'px';
+                cursor.style.top = screenY + 'px';
+                cursor.style.width = this.TILE_SIZE + 'px';
+                cursor.style.height = this.TILE_SIZE + 'px';
+                
+                this.aimOverlay.appendChild(cursor);
+                
+                const player = this.players[this.currentPlayer];
+                const weapon = this.weapons[player.weapon];
+                
+                if (weapon.type === 'shotgun' && this.aim.dx !== null) {
+                    const patterns = this.getShotgunPattern(this.aim.dx, this.aim.dy);
+                    
+                    patterns.forEach(([dx, dy]) => {
+                        const x = this.aim.x + dx;
+                        const y = this.aim.y + dy;
+                        
+                        const maxBound = this.isIndoor ? 8 : this.GRID_SIZE;
+                        if (x < 0 || y < 0 || x >= maxBound || y >= maxBound) return;
+                        
+                        if (this.isIndoor) {
+                            const tile = this.currentHouse.indoorMap[y][x];
+                            if (tile && tile.blocks) return;
+                        } else {
+                            const tile = this.map[y][x];
+                            if (tile && tile.blocks) return;
+                        }
+                        
+                        let cellX, cellY;
+                        if (this.isIndoor) {
+                            const offset = (this.GRID_SIZE - 8) * this.TILE_SIZE / 2;
+                            cellX = x * this.TILE_SIZE + offset;
+                            cellY = y * this.TILE_SIZE + offset;
+                        } else {
+                            cellX = x * this.TILE_SIZE;
+                            cellY = y * this.TILE_SIZE;
+                        }
+                        
+                        const cell = document.createElement('div');
+                        cell.className = 'shotgun-cell';
+                        cell.style.left = cellX + 'px';
+                        cell.style.top = cellY + 'px';
+                        cell.style.width = this.TILE_SIZE + 'px';
+                        cell.style.height = this.TILE_SIZE + 'px';
+                        
+                        this.shotgunPreview.appendChild(cell);
+                    });
+                }
+            }
+            
+            getShotgunPattern(dx, dy) {
+                if (dx !== 0 && dy === 0) {
+                    return [[dx,0], [dx,-1], [dx,1]];
+                }
+                if (dy !== 0 && dx === 0) {
+                    return [[0,dy], [-1,dy], [1,dy]];
+                }
+                return [[dx, dy]];
             }
             
             shoot() {
@@ -1406,50 +1555,129 @@
                 const shooter = this.players[this.currentPlayer];
                 const weapon = this.weapons[shooter.weapon];
                 
-                // Find target
-                const target = this.findTarget();
-                if (target) {
-                    if (this.checkLineOfSight(shooter, target)) {
-                        this.applyDamage(shooter, target, weapon.damage);
-                    } else {
-                        this.showMessage('Shot blocked by cover!');
-                    }
-                } else {
-                    this.showMessage('No target at aim location!');
+                switch (weapon.type) {
+                    case 'linear':
+                        this.fireLinear(shooter, weapon);
+                        break;
+                    case 'shotgun':
+                        this.fireShotgun(shooter, weapon);
+                        break;
+                    case 'rapid':
+                        this.fireRapid(shooter, weapon);
+                        break;
+                    case 'flame':
+                        this.fireFlamethrower(shooter, weapon);
+                        break;
                 }
                 
                 this.hasShot = true;
                 this.aiming = false;
-                this.aimDirection = null;
-                this.aimSteps = 0;
-                this.clearAim();
-                this.elements.aimInfo.style.display = 'none';
+                this.aim = { x: null, y: null, dx: null, dy: null, steps: 0 };
+                this.aimOverlay.innerHTML = '';
+                this.shotgunPreview.innerHTML = '';
+                this.statusIndicator.style.display = 'none';
+                
                 this.updateUI();
+                this.draw();
             }
             
-            findTarget() {
-                const shooter = this.players[this.currentPlayer];
+            fireLinear(shooter, weapon) {
+                const target = this.findTargetAt(shooter, this.aim.x, this.aim.y);
                 
+                if (!target) {
+                    this.playSound(200, 0.1);
+                    alert("No target at aimed position!");
+                    return;
+                }
+                
+                if (!this.checkLineOfSight(shooter, target)) {
+                    alert('Shot blocked by cover!');
+                    this.playSound(200, 0.1);
+                    return;
+                }
+                
+                this.applyDamage(shooter, target, weapon.damage);
+            }
+            
+            fireShotgun(shooter, weapon) {
+                if (this.aim.dx === null) return;
+                
+                const patterns = this.getShotgunPattern(this.aim.dx, this.aim.dy);
+                let hitCount = 0;
+                
+                patterns.forEach(([dx, dy]) => {
+                    const targetX = this.aim.x + dx;
+                    const targetY = this.aim.y + dy;
+                    
+                    const target = this.findTargetAt(shooter, targetX, targetY);
+                    if (!target) return;
+                    if (!this.checkLineOfSight(shooter, target)) return;
+                    
+                    const pelletDamage = Math.floor(weapon.damage / 2);
+                    this.applyDamage(shooter, target, pelletDamage);
+                    hitCount++;
+                });
+                
+                if (hitCount > 0) {
+                    this.playSound(300, 0.2);
+                } else {
+                    this.playSound(200, 0.1);
+                    alert("Shotgun spread missed!");
+                }
+            }
+            
+            fireRapid(shooter, weapon) {
+                const target = this.findTargetAt(shooter, this.aim.x, this.aim.y);
+                
+                if (!target || !this.checkLineOfSight(shooter, target)) {
+                    this.playSound(200, 0.1);
+                    alert("No valid target!");
+                    return;
+                }
+                
+                this.applyDamage(shooter, target, weapon.damage);
+                
+                setTimeout(() => {
+                    if (target.alive) {
+                        this.applyDamage(shooter, target, weapon.damage);
+                    }
+                }, 200);
+                
+                this.playSound(400, 0.3);
+            }
+            
+            fireFlamethrower(shooter, weapon) {
+                const target = this.findTargetAt(shooter, this.aim.x, this.aim.y);
+                
+                if (!target) {
+                    this.playSound(200, 0.1);
+                    alert("No target in range!");
+                    return;
+                }
+                
+                this.applyDamage(shooter, target, weapon.damage);
+                this.playSound(200, 0.4);
+            }
+            
+            findTargetAt(shooter, targetX, targetY) {
                 if (this.isIndoor) {
                     return this.players.find(p => 
-                        p.alive && 
-                        p !== shooter && 
-                        p.indoorPos &&
-                        p.indoorPos.x === this.aim.x && 
-                        p.indoorPos.y === this.aim.y
+                        p.alive && p !== shooter &&
+                        p.inHouse === shooter.inHouse &&
+                        p.indoorPos && p.indoorPos.x === targetX && p.indoorPos.y === targetY
                     );
                 } else {
                     return this.players.find(p => 
-                        p.alive && 
-                        p !== shooter && 
-                        !p.indoorPos &&
-                        p.x === this.aim.x && 
-                        p.y === this.aim.y
+                        p.alive && p !== shooter &&
+                        !p.inHouse && p.x === targetX && p.y === targetY
                     );
                 }
             }
             
             checkLineOfSight(shooter, target) {
+                const weapon = this.weapons[shooter.weapon];
+                if (weapon.type === 'flame') return true;
+                
                 let x1, y1, x2, y2, map;
                 
                 if (this.isIndoor) {
@@ -1466,11 +1694,10 @@
                     map = this.map;
                 }
                 
-                // Simple line check
                 const dx = Math.abs(x2 - x1);
                 const dy = Math.abs(y2 - y1);
-                const sx = x1 < x2 ? 1 : -1;
-                const sy = y1 < y2 ? 1 : -1;
+                const sx = (x1 < x2) ? 1 : -1;
+                const sy = (y1 < y2) ? 1 : -1;
                 let err = dx - dy;
                 
                 let x = x1;
@@ -1499,374 +1726,361 @@
                 return true;
             }
             
-            applyDamage(shooter, target, damage) {
-                // Apply armor reduction
-                target.gear.forEach(g => {
-                    if (g.effect === 'reduce') {
-                        damage = Math.floor(damage * (1 - g.value));
-                    }
-                });
+            applyDamage(shooter, target, baseDamage) {
+                let finalDamage = baseDamage;
                 
-                target.hp -= damage;
-                this.showMessage(`Hit Player ${this.players.indexOf(target) + 1} for ${damage} damage!`);
+                if (target.armor && target.armor.effect === 'damageReduction') {
+                    finalDamage = Math.floor(baseDamage * (1 - target.armor.value));
+                }
+                
+                target.hp -= finalDamage;
+                
+                this.playSound(400 + finalDamage * 2);
                 
                 if (target.hp <= 0) {
                     target.alive = false;
                     target.hp = 0;
-                    this.showMessage(`Player ${this.players.indexOf(target) + 1} eliminated!`);
                     
-                    // Check for winner
+                    if (target.inHouse) {
+                        const house = target.inHouse;
+                        const playerIndex = this.players.indexOf(target);
+                        const houseIndex = house.playersInside.indexOf(playerIndex);
+                        if (houseIndex > -1) {
+                            house.playersInside.splice(houseIndex, 1);
+                        }
+                        target.inHouse = null;
+                        target.indoorPos = null;
+                    }
+                    
+                    const shooterIndex = this.players.indexOf(shooter);
+                    const targetIndex = this.players.indexOf(target);
+                    
+                    alert(`🎯 Player ${shooterIndex + 1} eliminated Player ${targetIndex + 1}!`);
+                    
                     const alivePlayers = this.players.filter(p => p.alive);
                     if (alivePlayers.length === 1) {
                         const winnerIndex = this.players.findIndex(p => p.alive);
-                        setTimeout(() => {
-                            alert(`🎉 Player ${winnerIndex + 1} wins the game! 🏆`);
-                            this.gameActive = false;
-                        }, 500);
+                        alert(`🎉 🏆 Player ${winnerIndex + 1} wins the game! 🏆 🎉`);
+                        this.gameActive = false;
                     }
                 }
                 
                 this.updateUI();
-                this.draw();
+            }
+            
+            pickupItem(player, x, y, indoor = false) {
+                const weapons = ['pistol', 'rifle', 'shotgun', 'smg', 'flamethrower', 'sniper'];
+                const gearTypes = ['armor', 'scope', 'medkit'];
+                
+                const isWeapon = Math.random() > 0.5;
+                
+                if (isWeapon) {
+                    const newWeapon = weapons[Math.floor(Math.random() * weapons.length)];
+                    const oldWeapon = player.weapon;
+                    player.weapon = newWeapon;
+                    
+                    alert(`🔫 Found ${this.weapons[newWeapon].name}!\nReplaced your ${this.weapons[oldWeapon].name}`);
+                } else {
+                    const gearType = gearTypes[Math.floor(Math.random() * gearTypes.length)];
+                    const gear = { ...this.gearTypes[gearType] };
+                    
+                    if (gearType === 'medkit') {
+                        player.hp = Math.min(player.maxHp, player.hp + gear.value);
+                        alert(`💊 Found Medkit!\nHealed ${gear.value} HP.`);
+                    } else if (gearType === 'armor') {
+                        player.armor = gear;
+                        alert(`🛡️ Found Body Armor!\nNow reduces damage by 30%`);
+                    } else {
+                        player.gear.push(gear);
+                        alert(`🔭 Found Scope!\n+${gear.value} to weapon range`);
+                    }
+                }
+                
+                if (indoor) {
+                    player.inHouse.indoorMap[y][x] = null;
+                } else {
+                    this.map[y][x] = null;
+                }
+                
+                this.updateUI();
             }
             
             endTurn() {
-                if (!this.gameActive) return;
-                
-                // Reset turn state
                 this.movesLeft = 0;
                 this.hasShot = false;
                 this.hasRolled = false;
                 this.aiming = false;
-                this.aimDirection = null;
-                this.aimSteps = 0;
-                this.clearAim();
-                this.elements.aimInfo.style.display = 'none';
+                this.aim = { x: null, y: null, dx: null, dy: null, steps: 0 };
+                this.aimOverlay.innerHTML = '';
+                this.shotgunPreview.innerHTML = '';
+                this.statusIndicator.style.display = 'none';
                 
-                // Find next alive player
-                let nextPlayer = (this.currentPlayer + 1) % this.PLAYER_COUNT;
                 let attempts = 0;
-                while (!this.players[nextPlayer].alive && attempts < this.PLAYER_COUNT) {
-                    nextPlayer = (nextPlayer + 1) % this.PLAYER_COUNT;
+                do {
+                    this.currentPlayer = (this.currentPlayer + 1) % 4;
                     attempts++;
-                }
+                    if (attempts > 4) break;
+                } while (!this.players[this.currentPlayer].alive);
                 
-                if (attempts >= this.PLAYER_COUNT) {
-                    // No alive players found
-                    this.gameActive = false;
-                    return;
-                }
-                
-                this.currentPlayer = nextPlayer;
-                
-                // Update view for new player
-                if (this.players[nextPlayer].inHouse) {
-                    this.currentHouse = this.players[nextPlayer].inHouse;
-                    this.isIndoor = true;
-                    this.drawIndoor();
-                } else {
-                    this.isIndoor = false;
-                    this.currentHouse = null;
-                    this.draw();
-                }
-                
+                this.updateViewForCurrentPlayer();
                 this.updateUI();
-                this.showMessage(`Player ${nextPlayer + 1}'s turn`);
+                this.draw();
+                
+                alert(`↪️ Turn passed to Player ${this.currentPlayer + 1}`);
+            }
+            
+            updateViewForCurrentPlayer() {
+                const currentPlayer = this.players[this.currentPlayer];
+                
+                if (currentPlayer.inHouse) {
+                    this.currentHouse = currentPlayer.inHouse;
+                    this.isIndoor = true;
+                } else {
+                    this.currentHouse = null;
+                    this.isIndoor = false;
+                }
             }
             
             updateUI() {
                 const player = this.players[this.currentPlayer];
                 const weapon = this.weapons[player.weapon];
                 
-                // Update player info
-                this.elements.playerAvatar.textContent = player.emoji;
-                this.elements.playerName.textContent = `Player ${this.currentPlayer + 1}`;
+                // Update mini info
+                this.miniPlayer.textContent = `P${this.currentPlayer + 1} ${player.emoji}`;
                 
-                // Update status text
-                let status = '';
-                if (this.isIndoor) {
-                    status = 'Inside House';
-                } else if (this.aiming) {
-                    status = 'Aiming Mode';
-                } else if (this.movesLeft > 0) {
-                    status = `${this.movesLeft} moves left`;
-                } else if (!this.hasRolled) {
-                    status = 'Roll dice to move';
-                } else if (!this.hasShot) {
-                    status = 'Aim or end turn';
+                if (this.aiming) {
+                    this.miniMoves.textContent = "Aiming...";
+                } else if (player.inHouse) {
+                    this.miniMoves.textContent = "Indoors ∞";
+                } else if (this.hasRolled) {
+                    this.miniMoves.textContent = `${this.movesLeft} moves`;
                 } else {
-                    status = 'End turn';
-                }
-                this.elements.playerStatus.textContent = status;
-                
-                // Update health
-                const healthPercent = (player.hp / player.maxHp) * 100;
-                this.elements.healthFill.style.width = `${healthPercent}%`;
-                this.elements.healthText.textContent = player.hp;
-                
-                // Health bar color
-                if (healthPercent > 60) {
-                    this.elements.healthFill.style.background = '#2a9d8f';
-                } else if (healthPercent > 30) {
-                    this.elements.healthFill.style.background = '#f4a261';
-                } else {
-                    this.elements.healthFill.style.background = '#e63946';
+                    this.miniMoves.textContent = "Roll dice!";
                 }
                 
-                // Update weapon
-                this.elements.weaponIcon.textContent = weapon.emoji;
-                this.elements.weaponName.textContent = weapon.name;
+                // Update weapon info
+                this.miniWeapon.textContent = weapon.name;
                 
-                // Apply scope bonus to range
                 let range = weapon.range;
                 player.gear.forEach(g => {
-                    if (g.effect === 'range') range += g.value;
+                    if (g.effect === 'rangeBonus') range += g.value;
                 });
+                this.miniRange.textContent = `Range: ${range}`;
+                this.miniDamage.textContent = `Dmg: ${weapon.damage}`;
                 
-                this.elements.weaponStats.textContent = `Dmg: ${weapon.damage} | Range: ${range}`;
-                
-                // Update status
-                this.elements.statusMoves.textContent = this.movesLeft;
-                this.elements.statusArmor.textContent = player.gear.find(g => g.effect === 'reduce') ? 'Armored' : 'None';
-                this.elements.statusGear.textContent = player.gear.map(g => g.emoji).join(' ') || '-';
-                this.elements.statusMode.textContent = this.isIndoor ? 'House' : 'Outdoor';
-                
-                // Update players list
-                this.updatePlayersList();
+                // Update player info panel
+                this.updatePlayerInfoPanel();
                 
                 // Update button states
-                document.getElementById('btn-roll').disabled = this.hasRolled || this.isIndoor || this.aiming;
-                document.getElementById('btn-aim').disabled = this.hasShot || !this.hasRolled || this.aiming;
-                document.getElementById('btn-shoot').disabled = !this.aiming;
-                document.getElementById('btn-end').disabled = false;
+                const rollBtn = document.querySelector('.action-btn.roll');
+                const aimBtn = document.querySelector('.action-btn.aim');
+                const shootBtn = document.querySelector('.action-btn.shoot');
+                const endBtn = document.querySelector('.action-btn.end');
+                
+                rollBtn.disabled = this.hasRolled || this.aiming || player.inHouse;
+                aimBtn.disabled = this.hasShot || this.aiming || (!this.hasRolled && !player.inHouse);
+                shootBtn.disabled = !this.aiming;
+                endBtn.disabled = false;
+                
+                [rollBtn, aimBtn, shootBtn, endBtn].forEach(btn => {
+                    btn.style.opacity = btn.disabled ? '0.5' : '1';
+                });
             }
             
-            updatePlayersList() {
-                let html = '';
-                this.players.forEach((p, i) => {
-                    const isCurrent = i === this.currentPlayer;
-                    const status = p.alive ? 
-                        `${p.hp} HP${p.inHouse ? ' 🏠' : ''}` : 
-                        '💀 ELIMINATED';
+            updatePlayerInfoPanel() {
+                const playersInfo = document.getElementById('players-info');
+                playersInfo.innerHTML = '';
+                
+                this.players.forEach((player, index) => {
+                    if (!player.alive) {
+                        const playerDiv = document.createElement('div');
+                        playerDiv.className = 'player-info';
+                        playerDiv.innerHTML = `
+                            <div class="player-header">
+                                <span class="player-emoji">💀</span>
+                                <span class="player-name">Player ${index + 1} (Eliminated)</span>
+                            </div>
+                        `;
+                        playersInfo.appendChild(playerDiv);
+                        return;
+                    }
                     
-                    html += `
-                        <div class="player-item ${isCurrent ? 'current' : ''}">
-                            <span class="player-emoji-small">${p.emoji}</span>
-                            <span class="player-status" style="color: ${p.alive ? '#8ecae6' : '#e63946'}">
-                                ${status}
-                            </span>
+                    const playerDiv = document.createElement('div');
+                    playerDiv.className = `player-info ${index === this.currentPlayer ? 'current' : ''}`;
+                    
+                    const weapon = this.weapons[player.weapon];
+                    const armorEmoji = player.armor ? player.armor.emoji : '';
+                    const gearList = player.gear.map(g => g.emoji).join(' ');
+                    
+                    let range = weapon.range;
+                    player.gear.forEach(g => {
+                        if (g.effect === 'rangeBonus') range += g.value;
+                    });
+                    
+                    playerDiv.innerHTML = `
+                        <div class="player-header">
+                            <span class="player-emoji">${player.emoji}</span>
+                            <span class="player-name">Player ${index + 1}</span>
+                            ${player.inHouse ? '<span style="color:#9b59b6;">🏠</span>' : ''}
+                            ${index === this.currentPlayer ? '<span style="color:#3498db;">▶️</span>' : ''}
+                        </div>
+                        <div class="player-hp">
+                            <div class="player-hp-bar" style="width: ${(player.hp/player.maxHp)*100}%"></div>
+                        </div>
+                        <div class="player-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Weapon:</span>
+                                <span>${weapon.emoji} ${weapon.name}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Range:</span>
+                                <span>${range} tiles</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Damage:</span>
+                                <span>${weapon.damage}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Armor:</span>
+                                <span>${armorEmoji || 'None'}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Gear:</span>
+                                <span>${gearList || 'None'}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Moves:</span>
+                                <span>${player.inHouse ? '∞' : (index === this.currentPlayer && this.hasRolled ? this.movesLeft : '-')}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Health:</span>
+                                <span>${player.hp}/${player.maxHp}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Location:</span>
+                                <span>${player.inHouse ? 'Indoors' : 'Outdoors'}</span>
+                            </div>
                         </div>
                     `;
-                });
-                
-                this.elements.playersList.innerHTML = html;
-            }
-            
-            draw() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                // Draw grid background
-                for (let y = 0; y < this.GRID_SIZE; y++) {
-                    for (let x = 0; x < this.GRID_SIZE; x++) {
-                        // Tile background
-                        const isEven = (x + y) % 2 === 0;
-                        this.ctx.fillStyle = isEven ? '#1c3b2e' : '#2d5a45';
-                        this.ctx.fillRect(
-                            x * this.TILE_SIZE,
-                            y * this.TILE_SIZE,
-                            this.TILE_SIZE,
-                            this.TILE_SIZE
-                        );
-                        
-                        // Grid lines
-                        this.ctx.strokeStyle = '#3a7d44';
-                        this.ctx.strokeRect(
-                            x * this.TILE_SIZE,
-                            y * this.TILE_SIZE,
-                            this.TILE_SIZE,
-                            this.TILE_SIZE
-                        );
-                        
-                        // Draw tile content
-                        const tile = this.map[y][x];
-                        if (tile) {
-                            this.ctx.font = `${this.TILE_SIZE * 0.6}px Arial`;
-                            this.ctx.textAlign = 'center';
-                            this.ctx.textBaseline = 'middle';
-                            
-                            // Set color based on tile type
-                            if (tile.type === '🌳') this.ctx.fillStyle = '#2e7d32';
-                            else if (tile.type === '🏠') this.ctx.fillStyle = '#8d6e63';
-                            else if (tile.type === '📦') this.ctx.fillStyle = '#ffd700';
-                            
-                            this.ctx.fillText(
-                                tile.type,
-                                x * this.TILE_SIZE + this.TILE_SIZE / 2,
-                                y * this.TILE_SIZE + this.TILE_SIZE / 2
-                            );
-                        }
-                    }
-                }
-                
-                // Draw players
-                this.players.forEach((player, index) => {
-                    if (!player.alive || player.indoorPos) return;
                     
-                    this.drawPlayer(player, index, player.x, player.y);
+                    playersInfo.appendChild(playerDiv);
                 });
             }
             
-            drawIndoor() {
-                if (!this.currentHouse) return;
-                
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                const indoorSize = 5;
-                const offset = (this.GRID_SIZE - indoorSize) * this.TILE_SIZE / 2;
-                
-                // Draw indoor background
-                this.ctx.fillStyle = '#8b4513';
-                this.ctx.fillRect(offset, offset, indoorSize * this.TILE_SIZE, indoorSize * this.TILE_SIZE);
-                
-                // Draw indoor tiles
-                for (let y = 0; y < indoorSize; y++) {
-                    for (let x = 0; x < indoorSize; x++) {
-                        const tile = this.currentHouse.indoorMap[y][x];
-                        
-                        // Grid lines
-                        this.ctx.strokeStyle = '#a0522d';
-                        this.ctx.strokeRect(
-                            x * this.TILE_SIZE + offset,
-                            y * this.TILE_SIZE + offset,
-                            this.TILE_SIZE,
-                            this.TILE_SIZE
-                        );
-                        
-                        // Draw tile content
-                        if (tile) {
-                            this.ctx.font = `${this.TILE_SIZE * 0.6}px Arial`;
-                            this.ctx.textAlign = 'center';
-                            this.ctx.textBaseline = 'middle';
-                            
-                            if (tile.type === '🧱') this.ctx.fillStyle = '#795548';
-                            else if (tile.type === '🛋️') this.ctx.fillStyle = '#ff9800';
-                            else if (tile.type === '🪑') this.ctx.fillStyle = '#8d6e63';
-                            else if (tile.type === '🚪') this.ctx.fillStyle = '#4CAF50';
-                            
-                            this.ctx.fillText(
-                                tile.type,
-                                x * this.TILE_SIZE + offset + this.TILE_SIZE / 2,
-                                y * this.TILE_SIZE + offset + this.TILE_SIZE / 2
-                            );
-                        }
-                    }
+            playSound(frequency, duration = 0.1, type = 'sine') {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + duration);
+                } catch (e) {
+                    console.log('Sound effect');
                 }
-                
-                // Draw indoor players
-                this.currentHouse.playersInside.forEach(playerIndex => {
-                    const player = this.players[playerIndex];
-                    if (player.indoorPos) {
-                        this.drawPlayer(
-                            player, 
-                            playerIndex, 
-                            player.indoorPos.x, 
-                            player.indoorPos.y,
-                            offset
-                        );
-                    }
-                });
-            }
-            
-            drawPlayer(player, index, x, y, offset = 0) {
-                const screenX = x * this.TILE_SIZE + offset;
-                const screenY = y * this.TILE_SIZE + offset;
-                
-                // Player colors
-                const colors = ['#ff5252', '#2196F3', '#ffeb3b', '#e91e63'];
-                const color = colors[index % colors.length];
-                
-                // Draw player background circle
-                this.ctx.fillStyle = color;
-                this.ctx.beginPath();
-                this.ctx.arc(
-                    screenX + this.TILE_SIZE / 2,
-                    screenY + this.TILE_SIZE / 2,
-                    this.TILE_SIZE / 2 - 4,
-                    0,
-                    Math.PI * 2
-                );
-                this.ctx.fill();
-                
-                // Draw player emoji
-                this.ctx.font = `${this.TILE_SIZE * 0.6}px Arial`;
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillStyle = '#fff';
-                this.ctx.fillText(
-                    player.emoji,
-                    screenX + this.TILE_SIZE / 2,
-                    screenY + this.TILE_SIZE / 2
-                );
-                
-                // Draw health number if not full
-                if (player.hp < 100) {
-                    this.ctx.font = `${this.TILE_SIZE * 0.3}px Arial`;
-                    this.ctx.fillStyle = player.hp > 50 ? '#4CAF50' : 
-                                        player.hp > 25 ? '#ff9800' : '#f44336';
-                    this.ctx.fillText(
-                        player.hp,
-                        screenX + this.TILE_SIZE / 2,
-                        screenY + this.TILE_SIZE - 5
-                    );
-                }
-                
-                // Highlight current player
-                if (index === this.currentPlayer) {
-                    this.ctx.strokeStyle = color;
-                    this.ctx.lineWidth = 3;
-                    this.ctx.beginPath();
-                    this.ctx.arc(
-                        screenX + this.TILE_SIZE / 2,
-                        screenY + this.TILE_SIZE / 2,
-                        this.TILE_SIZE / 2 - 2,
-                        0,
-                        Math.PI * 2
-                    );
-                    this.ctx.stroke();
-                }
-            }
-            
-            showMessage(text, important = false) {
-                console.log(text); // For debugging
-                if (important) {
-                    alert(text);
-                }
-            }
-            
-            showTouchFeedback(event) {
-                const touch = event.touches ? event.touches[0] : event;
-                const feedback = document.createElement('div');
-                feedback.style.position = 'fixed';
-                feedback.style.left = `${touch.clientX}px`;
-                feedback.style.top = `${touch.clientY}px`;
-                feedback.style.width = '60px';
-                feedback.style.height = '60px';
-                feedback.style.background = 'rgba(42, 157, 143, 0.3)';
-                feedback.style.borderRadius = '50%';
-                feedback.style.transform = 'scale(0)';
-                feedback.style.animation = 'touchRipple 0.4s ease-out';
-                feedback.style.pointerEvents = 'none';
-                feedback.style.zIndex = '9999';
-                
-                document.body.appendChild(feedback);
-                setTimeout(() => feedback.remove(), 400);
             }
         }
 
-        // Initialize game when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            // Create global game instance
-            window.battleRoyale = new BattleRoyaleGame();
+        // Initialize game
+        function initGame() {
+            game = new MobileBattleRoyale();
+            
+            // Handle resize events
+            window.addEventListener('resize', () => {
+                checkOrientation();
+                if (game) game.handleResize();
+            });
+            
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    checkOrientation();
+                    if (game) game.handleResize();
+                }, 100);
+            });
+            
+            // Fullscreen change events
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+        }
+
+        function handleFullscreenChange() {
+            // Force resize after fullscreen change
+            setTimeout(() => {
+                if (game) game.handleResize();
+            }, 100);
+        }
+
+        // Global functions
+        function startMove(dx, dy) {
+            if (game) game.startMove(dx, dy);
+        }
+
+        function stopMove() {
+            if (game) game.stopMove();
+        }
+
+        function rollDice() {
+            if (game) game.rollDice();
+        }
+
+        function enterAim() {
+            if (game) game.enterAim();
+        }
+
+        function shoot() {
+            if (game) game.shoot();
+        }
+
+        function endTurn() {
+            if (game) game.endTurn();
+        }
+
+        function showPlayerInfo() {
+            document.getElementById('player-info-panel').classList.add('active');
+        }
+
+        function hidePlayerInfo() {
+            document.getElementById('player-info-panel').classList.remove('active');
+        }
+
+        function showRules() {
+            document.getElementById('rules-panel').classList.add('active');
+        }
+
+        function hideRules() {
+            document.getElementById('rules-panel').classList.remove('active');
+        }
+
+        // Prevent context menu
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Check if already in fullscreen or landscape
+        window.addEventListener('load', () => {
+            // Check if already fullscreen or on non-mobile
+            const isFullscreen = document.fullscreenElement || 
+                                document.webkitFullscreenElement || 
+                                document.mozFullScreenElement || 
+                                document.msFullscreenElement;
+            
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            if (!isMobile || isFullscreen) {
+                // Skip fullscreen overlay for non-mobile or already fullscreen
+                document.getElementById('fullscreen-overlay').style.display = 'none';
+                checkOrientation();
+                initGame();
+            }
         });
     </script>
 </body>

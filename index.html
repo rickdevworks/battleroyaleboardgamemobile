@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Mobile Battle Royale</title>
+    <title>Mobile Battle Royale - LANDSCAPE ONLY</title>
     <style>
-        /* CSS RESET FOR MOBILE */
+        /* MOBILE-FIRST RESET */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: 100%;
+            -webkit-text-size-adjust: none;
             touch-action: manipulation;
         }
 
@@ -22,191 +22,328 @@
             height: 100vh;
             overflow: hidden;
             background: #0a0e17;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             position: fixed;
         }
 
+        /* ROTATION OVERLAY */
+        #rotate-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0a0e17;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .rotate-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: rotateAnimation 2s infinite;
+        }
+
+        @keyframes rotateAnimation {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .rotate-message {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2a9d8f;
+            margin-bottom: 15px;
+        }
+
+        .rotate-instruction {
+            font-size: 18px;
+            color: #8ecae6;
+            max-width: 300px;
+            line-height: 1.4;
+        }
+
+        /* GAME CONTAINER - LANDSCAPE ONLY */
         #game-container {
             width: 100vw;
             height: 100vh;
-            display: flex;
+            display: none;
             flex-direction: column;
-            position: relative;
             background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
         }
 
-        /* HEADER - MOBILE OPTIMIZED */
-        #game-header {
-            padding: 12px 15px;
+        /* TOP BAR - GAME INFO */
+        #top-bar {
+            height: 60px;
             background: rgba(21, 26, 40, 0.95);
             backdrop-filter: blur(10px);
-            border-bottom: 2px solid #2a9d8f;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
+            padding: 0 15px;
+            border-bottom: 2px solid #2a9d8f;
             flex-shrink: 0;
-            z-index: 100;
         }
 
-        .player-turn-indicator {
+        .player-display {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: bold;
-            font-size: 18px;
+            gap: 12px;
         }
 
-        .player-emoji {
-            font-size: 24px;
-            animation: pulse 1.5s infinite;
+        .player-avatar {
+            font-size: 28px;
+            animation: playerPulse 2s infinite;
         }
 
-        @keyframes pulse {
+        @keyframes playerPulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
 
-        .player-health {
+        .player-info h3 {
+            color: #2a9d8f;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .player-info p {
+            color: #8ecae6;
+            font-size: 14px;
+        }
+
+        .health-display {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 16px;
+            gap: 10px;
         }
 
         .health-bar {
-            width: 100px;
-            height: 8px;
+            width: 120px;
+            height: 10px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 5px;
             overflow: hidden;
         }
 
         .health-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 5px;
             transition: width 0.3s ease;
         }
 
-        /* GAME BOARD - MOBILE FRIENDLY */
-        #game-board {
+        .health-text {
+            font-weight: bold;
+            font-size: 18px;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        /* MAIN GAME AREA */
+        #game-area {
             flex: 1;
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        /* GAME BOARD */
+        #board-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        #board-header {
+            height: 40px;
+            background: rgba(42, 157, 143, 0.2);
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #2a9d8f;
+            font-size: 16px;
+        }
+
+        #board-wrapper {
+            flex: 1;
+            background: #1c3b2e;
+            border-radius: 0 0 10px 10px;
+            border: 3px solid #2a9d8f;
             position: relative;
             overflow: hidden;
+            min-height: 0;
+        }
+
+        #game-board {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* SIDEBAR */
+        #sidebar {
+            flex: 1;
+            min-width: 200px;
+            max-width: 250px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        #board-canvas {
-            max-width: 100%;
-            max-height: 100%;
-            background: #1c3b2e;
-            border-radius: 12px;
-            border: 3px solid #2a9d8f;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            touch-action: none;
-        }
-
-        /* GAMEPAD CONTROLS - MOBILE SPECIFIC */
-        #gamepad-container {
+        .panel {
+            background: rgba(21, 26, 40, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 2px solid #2a9d8f;
             padding: 15px;
+        }
+
+        .panel-title {
+            color: #2a9d8f;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* WEAPON PANEL */
+        .weapon-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .weapon-icon {
+            font-size: 36px;
+        }
+
+        .weapon-info {
+            flex: 1;
+        }
+
+        .weapon-name {
+            font-weight: bold;
+            color: #f4a261;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .weapon-stats {
+            color: #8ecae6;
+            font-size: 12px;
+        }
+
+        /* STATUS PANEL */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .status-label {
+            color: #8ecae6;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* GAMEPAD CONTROLS */
+        #gamepad-container {
+            height: 180px;
             background: rgba(21, 26, 40, 0.95);
             backdrop-filter: blur(10px);
             border-top: 2px solid #2a9d8f;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             flex-shrink: 0;
-            z-index: 100;
         }
 
-        /* MOVEMENT PAD */
+        .movement-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
         .movement-pad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-            max-width: 300px;
-            margin: 0 auto 20px;
+            gap: 5px;
         }
 
-        .pad-center {
-            grid-column: 2;
-            grid-row: 2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            font-size: 24px;
-            color: #2a9d8f;
-        }
-
-        .pad-button {
+        .move-btn {
+            width: 60px;
+            height: 60px;
             background: rgba(42, 157, 143, 0.8);
             border: none;
             border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            font-size: 28px;
             color: white;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             touch-action: manipulation;
-            user-select: none;
             transition: all 0.1s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
-        .pad-button:active {
+        .move-btn:active {
             transform: scale(0.9);
             background: rgba(42, 157, 143, 1);
         }
 
-        .pad-up { grid-column: 2; grid-row: 1; }
-        .pad-down { grid-column: 2; grid-row: 3; }
-        .pad-left { grid-column: 1; grid-row: 2; }
-        .pad-right { grid-column: 3; grid-row: 2; }
-
-        /* ACTION BUTTONS */
         .action-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            max-width: 400px;
-            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
 
         .action-btn {
-            background: linear-gradient(135deg, #e76f51, #f4a261);
+            flex: 1;
+            height: 50px;
+            background: linear-gradient(135deg, #2a9d8f, #264653);
             border: none;
-            border-radius: 12px;
-            padding: 15px 5px;
+            border-radius: 10px;
             color: white;
-            font-size: 14px;
             font-weight: bold;
+            font-size: 14px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 8px;
             touch-action: manipulation;
-            user-select: none;
             transition: all 0.1s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .action-btn:active {
             transform: scale(0.95);
-        }
-
-        .action-btn span:first-child {
-            font-size: 20px;
-        }
-
-        .action-btn.primary {
-            background: linear-gradient(135deg, #2a9d8f, #264653);
         }
 
         .action-btn.combat {
@@ -217,179 +354,52 @@
             background: linear-gradient(135deg, #9d4edd, #560bad);
         }
 
-        /* GAME INFO PANEL - TOUCH FRIENDLY */
-        #game-info {
-            position: absolute;
-            top: 70px;
-            left: 15px;
-            right: 15px;
-            background: rgba(21, 26, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 15px;
-            border: 2px solid #2a9d8f;
-            display: none;
-            z-index: 1000;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .info-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .close-info {
-            background: #e63946;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            color: white;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #8ecae6;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        /* WEAPON DISPLAY */
-        #weapon-display {
-            position: absolute;
-            bottom: 250px;
-            left: 15px;
-            background: rgba(21, 26, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 12px;
-            border: 2px solid #f4a261;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 50;
-        }
-
-        .weapon-icon {
-            font-size: 32px;
-        }
-
-        .weapon-details {
-            flex: 1;
-        }
-
-        .weapon-name {
-            font-weight: bold;
-            font-size: 16px;
-            color: #f4a261;
-        }
-
-        .weapon-stats {
-            font-size: 12px;
-            color: #8ecae6;
-        }
-
-        /* AIM OVERLAY */
-        #aim-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 20;
-        }
-
-        .aim-cell {
-            position: absolute;
-            border: 3px solid #ffba08;
-            background: rgba(255, 186, 8, 0.1);
-            border-radius: 4px;
-            animation: aimPulse 1s infinite;
-        }
-
-        @keyframes aimPulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        /* MODALS - TOUCH FRIENDLY */
+        /* MODALS */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100vw;
+            height: 100vh;
             background: rgba(0, 0, 0, 0.9);
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 1000;
             padding: 20px;
         }
 
         .modal-content {
             background: linear-gradient(135deg, #1a1f2e, #0a0e17);
-            border-radius: 20px;
+            border-radius: 15px;
             padding: 25px;
-            max-width: 500px;
+            max-width: 400px;
             width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
             border: 3px solid #2a9d8f;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-header {
             text-align: center;
-            margin-bottom: 20px;
         }
 
-        .modal-header h2 {
+        .modal-title {
             color: #2a9d8f;
             font-size: 24px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
-        .modal-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 25px;
+        .modal-message {
+            color: #8ecae6;
+            line-height: 1.5;
+            margin-bottom: 25px;
         }
 
         .modal-btn {
-            padding: 18px;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
+            width: 100%;
+            height: 50px;
             background: linear-gradient(135deg, #2a9d8f, #264653);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -397,308 +407,217 @@
             touch-action: manipulation;
         }
 
-        /* LOADING SCREEN */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #0a0e17;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(42, 157, 143, 0.3);
-            border-top-color: #2a9d8f;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* TOUCH FEEDBACK */
-        .touch-feedback {
-            position: absolute;
-            background: rgba(42, 157, 143, 0.3);
-            border-radius: 50%;
-            transform: scale(0);
-            animation: touchRipple 0.4s ease-out;
-            pointer-events: none;
-        }
-
-        @keyframes touchRipple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        /* UTILITY CLASSES */
+        /* UTILITY */
         .hidden {
             display: none !important;
         }
 
-        /* RESPONSIVE ADJUSTMENTS */
-        @media (max-height: 700px) {
-            .pad-button {
-                width: 60px;
-                height: 60px;
+        /* LANDSCAPE ORIENTATION STYLES */
+        @media (orientation: landscape) and (max-height: 500px) {
+            #top-bar {
+                height: 50px;
+                padding: 0 10px;
+            }
+            
+            .player-avatar {
                 font-size: 24px;
             }
             
-            .action-btn {
-                padding: 12px 5px;
-                font-size: 12px;
-            }
-            
-            .action-btn span:first-child {
-                font-size: 18px;
-            }
-        }
-
-        @media (max-width: 768px) and (orientation: portrait) {
-            #game-container {
-                flex-direction: column;
-            }
-            
-            #game-board {
-                order: 1;
-                flex: 2;
+            .health-bar {
+                width: 100px;
             }
             
             #gamepad-container {
-                order: 2;
+                height: 150px;
+                padding: 10px;
             }
             
-            .action-buttons {
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(2, 1fr);
+            .move-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .action-btn {
+                height: 45px;
+                font-size: 12px;
+            }
+        }
+
+        @media (orientation: portrait) {
+            #game-container {
+                display: none !important;
+            }
+            
+            #rotate-overlay {
+                display: flex;
             }
         }
     </style>
 </head>
 <body>
-    <!-- LOADING SCREEN -->
-    <div id="loading-screen">
-        <div class="loading-spinner"></div>
-        <h2 style="color: #2a9d8f; margin-bottom: 10px;">Loading Battle Royale</h2>
-        <p style="color: #8ecae6; text-align: center; max-width: 300px;">
-            Optimizing for your device...
-        </p>
+    <!-- ROTATION OVERLAY -->
+    <div id="rotate-overlay">
+        <div class="rotate-icon">🔄</div>
+        <div class="rotate-message">Please Rotate Your Device</div>
+        <div class="rotate-instruction">
+            This game is optimized for landscape mode. Please rotate your device to play.
+        </div>
     </div>
 
     <!-- GAME CONTAINER -->
-    <div id="game-container" class="hidden">
-        <!-- HEADER -->
-        <div id="game-header">
-            <div class="player-turn-indicator">
-                <span class="player-emoji" id="current-player-emoji">🧍‍♂️</span>
-                <div>
-                    <div style="font-size: 14px; color: #8ecae6;">Player</div>
-                    <div id="current-player-name" style="color: #2a9d8f;">1</div>
+    <div id="game-container">
+        <!-- TOP BAR -->
+        <div id="top-bar">
+            <div class="player-display">
+                <div class="player-avatar" id="player-avatar">🧍‍♂️</div>
+                <div class="player-info">
+                    <h3 id="player-name">Player 1</h3>
+                    <p id="player-status">Turn: Roll Dice</p>
                 </div>
             </div>
             
-            <div class="player-health">
-                <span id="current-health">100</span>
+            <div class="health-display">
                 <div class="health-bar">
                     <div id="health-fill" class="health-fill" style="width: 100%; background: #2a9d8f;"></div>
                 </div>
+                <div class="health-text" id="health-text">100</div>
             </div>
-            
-            <button id="toggle-info" class="action-btn" style="padding: 10px; font-size: 20px;">
-                ℹ️
-            </button>
         </div>
 
-        <!-- GAME BOARD -->
-        <div id="game-board">
-            <canvas id="board-canvas"></canvas>
-            <div id="aim-overlay"></div>
-            
-            <!-- WEAPON DISPLAY -->
-            <div id="weapon-display">
-                <div class="weapon-icon">🔫</div>
-                <div class="weapon-details">
-                    <div class="weapon-name" id="current-weapon">Pistol</div>
-                    <div class="weapon-stats" id="weapon-stats">Dmg: 15 | Range: 5</div>
+        <!-- MAIN GAME AREA -->
+        <div id="game-area">
+            <!-- GAME BOARD -->
+            <div id="board-container">
+                <div id="board-header">BATTLE ROYALE ARENA</div>
+                <div id="board-wrapper">
+                    <canvas id="game-board"></canvas>
+                    <div id="aim-overlay"></div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <div id="sidebar">
+                <!-- WEAPON PANEL -->
+                <div class="panel">
+                    <div class="panel-title">🎯 CURRENT WEAPON</div>
+                    <div class="weapon-display">
+                        <div class="weapon-icon" id="weapon-icon">🔫</div>
+                        <div class="weapon-info">
+                            <div class="weapon-name" id="weapon-name">Pistol</div>
+                            <div class="weapon-stats" id="weapon-stats">Damage: 15 | Range: 5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATUS PANEL -->
+                <div class="panel">
+                    <div class="panel-title">📊 GAME STATUS</div>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-label">Moves Left</div>
+                            <div class="status-value" id="status-moves">0</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Armor</div>
+                            <div class="status-value" id="status-armor">None</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Gear</div>
+                            <div class="status-value" id="status-gear">-</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Mode</div>
+                            <div class="status-value" id="status-mode">Idle</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLAYERS PANEL -->
+                <div class="panel">
+                    <div class="panel-title">👥 PLAYERS</div>
+                    <div id="players-list">
+                        <!-- Players will be added here -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- GAMEPAD CONTROLS -->
         <div id="gamepad-container">
-            <!-- MOVEMENT PAD -->
-            <div class="movement-pad">
-                <button class="pad-button pad-up" data-direction="up">↑</button>
-                <button class="pad-button pad-left" data-direction="left">←</button>
-                <div class="pad-center">🎮</div>
-                <button class="pad-button pad-right" data-direction="right">→</button>
-                <button class="pad-button pad-down" data-direction="down">↓</button>
+            <div class="movement-controls">
+                <div class="movement-pad">
+                    <div></div>
+                    <button class="move-btn" data-direction="up">↑</button>
+                    <div></div>
+                    <button class="move-btn" data-direction="left">←</button>
+                    <div></div>
+                    <button class="move-btn" data-direction="right">→</button>
+                    <div></div>
+                    <button class="move-btn" data-direction="down">↓</button>
+                    <div></div>
+                </div>
             </div>
             
-            <!-- ACTION BUTTONS -->
             <div class="action-buttons">
-                <button id="btn-roll" class="action-btn primary">
+                <button id="btn-roll" class="action-btn">
                     <span>🎲</span>
-                    <span>Roll Dice</span>
+                    ROLL
                 </button>
                 <button id="btn-aim" class="action-btn combat">
                     <span>🎯</span>
-                    <span>Aim Mode</span>
+                    AIM
                 </button>
                 <button id="btn-shoot" class="action-btn combat">
                     <span>🔥</span>
-                    <span>Shoot</span>
+                    SHOOT
                 </button>
                 <button id="btn-end" class="action-btn special">
                     <span>⏭️</span>
-                    <span>End Turn</span>
+                    END
                 </button>
-            </div>
-        </div>
-
-        <!-- GAME INFO PANEL -->
-        <div id="game-info">
-            <div class="info-header">
-                <h3 style="color: #2a9d8f;">Game Status</h3>
-                <button class="close-info">×</button>
-            </div>
-            
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-label">Moves Left</div>
-                    <div class="stat-value" id="info-moves">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Weapon</div>
-                    <div class="stat-value" id="info-weapon">Pistol</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Armor</div>
-                    <div class="stat-value" id="info-armor">None</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Gear</div>
-                    <div class="stat-value" id="info-gear">-</div>
-                </div>
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <div class="stat-label">Game Mode</div>
-                <div class="stat-value" id="info-mode">Waiting for dice roll</div>
-            </div>
-            
-            <div style="margin-top: 15px;">
-                <div class="stat-label">Players Status</div>
-                <div id="players-status" style="margin-top: 10px;">
-                    <!-- Players will be listed here -->
-                </div>
             </div>
         </div>
     </div>
 
     <!-- WELCOME MODAL -->
-    <div id="welcome-modal" class="modal-overlay hidden">
+    <div id="welcome-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>🎮 MOBILE BATTLE ROYALE 🎮</h2>
-                <p style="color: #8ecae6; margin-top: 10px;">
-                    Last player standing wins!
-                </p>
+            <div class="modal-title">🎮 MOBILE BATTLE ROYALE</div>
+            <div class="modal-message">
+                <p>Last player standing wins!</p>
+                <p>4 players. Turn-based combat. Find weapons. Enter houses. Eliminate enemies.</p>
             </div>
-            
-            <div style="margin: 20px 0;">
-                <h3 style="color: #f4a261; margin-bottom: 10px;">🏆 How to Play:</h3>
-                <ul style="padding-left: 20px; color: #e0e0e0; line-height: 1.6;">
-                    <li>4 players start in corners</li>
-                    <li>Roll dice to get movement points</li>
-                    <li>Use gamepad to move your character</li>
-                    <li>Enter houses for loot and cover</li>
-                    <li>Find weapons and gear in crates</li>
-                    <li>Aim and shoot to eliminate others</li>
-                    <li>Last player alive wins!</li>
-                </ul>
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <h3 style="color: #f4a261; margin-bottom: 10px;">🎯 Controls:</h3>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <div style="background: rgba(42, 157, 143, 0.2); padding: 10px; border-radius: 8px;">
-                        <div style="font-size: 20px;">🎮</div>
-                        <div>Movement Pad</div>
-                    </div>
-                    <div style="background: rgba(244, 162, 97, 0.2); padding: 10px; border-radius: 8px;">
-                        <div style="font-size: 20px;">🎲</div>
-                        <div>Roll Dice</div>
-                    </div>
-                    <div style="background: rgba(230, 57, 70, 0.2); padding: 10px; border-radius: 8px;">
-                        <div style="font-size: 20px;">🎯</div>
-                        <div>Aim Mode</div>
-                    </div>
-                    <div style="background: rgba(157, 78, 221, 0.2); padding: 10px; border-radius: 8px;">
-                        <div style="font-size: 20px;">🔥</div>
-                        <div>Shoot</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button id="start-game-btn" class="modal-btn">
-                    🚀 START GAME
-                </button>
-            </div>
+            <button id="start-game-btn" class="modal-btn">
+                🚀 START GAME
+            </button>
         </div>
     </div>
 
     <!-- HOUSE MODAL -->
     <div id="house-modal" class="modal-overlay hidden">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>🏠 HOUSE ENTERED!</h2>
-                <p style="color: #8ecae6;">
-                    Move freely inside, find loot, and exit via door.
-                </p>
+            <div class="modal-title">🏠 HOUSE ENTERED!</div>
+            <div class="modal-message">
+                <p>You entered a house!</p>
+                <p>• Move freely inside</p>
+                <p>• Find food and items</p>
+                <p>• Use furniture for cover</p>
+                <p>• Exit via door tile (🚪)</p>
             </div>
-            
-            <div style="text-align: center; margin: 20px 0;">
-                <div style="font-size: 48px;">🏠</div>
-                <p style="color: #e0e0e0; margin-top: 10px;">
-                    Inside the house, you can:
-                </p>
-                <ul style="text-align: left; margin-top: 10px; color: #8ecae6;">
-                    <li>Move without dice restrictions</li>
-                    <li>Find food and healing items</li>
-                    <li>Discover hidden weapon crates</li>
-                    <li>Use furniture for cover</li>
-                    <li>Exit via the 🚪 door</li>
-                </ul>
-            </div>
-            
-            <div class="modal-actions">
-                <button id="enter-house-btn" class="modal-btn">
-                    🚪 ENTER HOUSE
-                </button>
-            </div>
+            <button id="enter-house-btn" class="modal-btn">
+                🚪 CONTINUE
+            </button>
         </div>
     </div>
 
     <script>
-        class MobileBattleRoyale {
+        // Mobile Battle Royale Game
+        class BattleRoyaleGame {
             constructor() {
-                // Mobile-optimized configuration
-                this.GRID_SIZE = 12; // Smaller grid for mobile
-                this.TILE_SIZE = 40; // Larger tiles for touch
+                // Game configuration
+                this.GRID_SIZE = 10; // Smaller grid for mobile
+                this.TILE_SIZE = 0; // Will be calculated
                 this.PLAYER_COUNT = 4;
                 
                 // Game state
@@ -706,204 +625,78 @@
                 this.movesLeft = 0;
                 this.hasShot = false;
                 this.hasRolled = false;
-                this.gameActive = true;
+                this.gameActive = false;
                 this.isIndoor = false;
                 this.currentHouse = null;
                 this.aiming = false;
-                this.aim = { x: null, y: null, dx: null, dy: null, steps: 0 };
+                this.aim = { x: 0, y: 0 };
                 
-                // Mobile-specific
-                this.touchStart = null;
-                this.swipeThreshold = 30;
-                
-                // Initialize immediately
-                this.initializeGame();
-            }
-            
-            initializeGame() {
-                try {
-                    // Hide loading screen and show welcome modal immediately
-                    document.getElementById('loading-screen').classList.add('hidden');
-                    document.getElementById('welcome-modal').classList.remove('hidden');
-                    
-                    // Initialize canvas
-                    this.initCanvas();
-                    
-                    // Initialize game data
-                    this.initMap();
-                    this.initPlayers();
-                    this.initWeapons();
-                    this.initGear();
-                    
-                    // Initialize controls and modals
-                    this.initControls();
-                    this.initModals();
-                    
-                    // Draw initial state
-                    this.draw();
-                    this.updateUI();
-                    
-                    // Prevent context menu on mobile
-                    document.addEventListener('contextmenu', (e) => e.preventDefault());
-                    
-                } catch (error) {
-                    console.error('Game initialization error:', error);
-                    // Fallback - hide loading and show error
-                    document.getElementById('loading-screen').classList.add('hidden');
-                    document.getElementById('welcome-modal').classList.remove('hidden');
-                }
-            }
-            
-            initCanvas() {
-                this.canvas = document.getElementById('board-canvas');
-                this.ctx = this.canvas.getContext('2d');
-                
-                // Set canvas size based on screen
-                this.resizeCanvas();
-                
-                // Handle window resize
-                window.addEventListener('resize', () => this.resizeCanvas());
-                window.addEventListener('orientationchange', () => {
-                    setTimeout(() => this.resizeCanvas(), 100);
-                });
-                
-                // Touch events for canvas
-                this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
-                this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
-                this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e));
-                
-                // Click events for desktop testing
-                this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
-            }
-            
-            resizeCanvas() {
-                const board = document.getElementById('game-board');
-                const size = Math.min(board.clientWidth, board.clientHeight) - 20;
-                
-                this.canvas.width = size;
-                this.canvas.height = size;
-                this.TILE_SIZE = Math.floor(size / this.GRID_SIZE);
-                
-                // Redraw if game is initialized
-                if (this.players) {
-                    this.draw();
-                }
-            }
-            
-            initMap() {
+                // Game objects
                 this.map = [];
                 this.houses = [];
+                this.players = [];
+                this.weapons = {};
+                this.gear = {};
                 
-                for (let y = 0; y < this.GRID_SIZE; y++) {
-                    this.map[y] = [];
-                    for (let x = 0; x < this.GRID_SIZE; x++) {
-                        const r = Math.random();
-                        if (r < 0.1) {
-                            this.map[y][x] = { type: '🌳', blocks: true, cover: true };
-                        } else if (r < 0.15) {
-                            this.map[y][x] = { type: '🪨', blocks: true, cover: true };
-                        } else if (r < 0.18) {
-                            this.map[y][x] = { type: '🏠', blocks: false, house: true };
-                            this.houses.push({ 
-                                x, y, 
-                                indoorMap: this.createIndoorMap(),
-                                playersInside: []
-                            });
-                        } else if (r < 0.22) {
-                            this.map[y][x] = { type: '📦', blocks: false, item: true };
-                        } else {
-                            this.map[y][x] = null;
-                        }
-                    }
+                // DOM elements
+                this.canvas = null;
+                this.ctx = null;
+                
+                // Initialize
+                this.init();
+            }
+            
+            init() {
+                // Check orientation first
+                this.checkOrientation();
+                
+                // Initialize game systems
+                this.initGameData();
+                this.initDOM();
+                this.initCanvas();
+                this.initControls();
+                this.initModals();
+                
+                // Start orientation monitoring
+                this.startOrientationMonitor();
+                
+                // Show welcome modal
+                setTimeout(() => {
+                    document.getElementById('welcome-modal').style.display = 'flex';
+                }, 500);
+            }
+            
+            checkOrientation() {
+                const isPortrait = window.innerHeight > window.innerWidth;
+                const rotateOverlay = document.getElementById('rotate-overlay');
+                const gameContainer = document.getElementById('game-container');
+                
+                if (isPortrait) {
+                    rotateOverlay.style.display = 'flex';
+                    gameContainer.style.display = 'none';
+                } else {
+                    rotateOverlay.style.display = 'none';
+                    gameContainer.style.display = 'flex';
                 }
-                
-                // Clear starting corners
-                const corners = [
-                    [0, this.GRID_SIZE-1],
-                    [0, 0],
-                    [this.GRID_SIZE-1, 0],
-                    [this.GRID_SIZE-1, this.GRID_SIZE-1]
-                ];
-                
-                corners.forEach(([x, y]) => {
-                    this.map[y][x] = null;
+            }
+            
+            startOrientationMonitor() {
+                window.addEventListener('resize', () => this.checkOrientation());
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => this.checkOrientation(), 100);
                 });
             }
             
-            createIndoorMap() {
-                const indoorSize = 6; // Smaller for mobile
-                const indoorMap = [];
-                
-                for (let y = 0; y < indoorSize; y++) {
-                    indoorMap[y] = [];
-                    for (let x = 0; x < indoorSize; x++) {
-                        indoorMap[y][x] = null;
-                    }
-                }
-                
-                // Walls
-                for (let y = 0; y < indoorSize; y++) {
-                    for (let x = 0; x < indoorSize; x++) {
-                        if (x === 0 || y === 0 || x === indoorSize-1 || y === indoorSize-1) {
-                            // Door in middle of bottom wall
-                            if (x === Math.floor(indoorSize/2) && y === indoorSize-1) {
-                                indoorMap[y][x] = { type: '🚪', blocks: false, door: true };
-                            } else {
-                                indoorMap[y][x] = { type: '🧱', blocks: true };
-                            }
-                        }
-                    }
-                }
-                
-                // Furniture and items
-                const furniture = ['🛋️', '🪑', '📦'];
-                const food = ['🍎', '🍗'];
-                
-                for (let y = 1; y < indoorSize-1; y++) {
-                    for (let x = 1; x < indoorSize-1; x++) {
-                        // Skip area near door
-                        if (x >= Math.floor(indoorSize/2)-1 && x <= Math.floor(indoorSize/2)+1 && 
-                            y >= indoorSize-3) continue;
-                            
-                        const r = Math.random();
-                        if (r < 0.25) {
-                            indoorMap[y][x] = { 
-                                type: furniture[Math.floor(Math.random() * furniture.length)], 
-                                blocks: true 
-                            };
-                        } else if (r < 0.3) {
-                            indoorMap[y][x] = { 
-                                type: food[Math.floor(Math.random() * food.length)], 
-                                blocks: false, 
-                                food: true,
-                                heal: 20 
-                            };
-                        }
-                    }
-                }
-                
-                return indoorMap;
-            }
-            
-            initPlayers() {
-                this.players = [
-                    { x: 0, y: this.GRID_SIZE-1, hp: 100, weapon: 'pistol', emoji: '🧍‍♂️', alive: true, gear: [] },
-                    { x: 0, y: 0, hp: 100, weapon: 'pistol', emoji: '🧍‍♀️', alive: true, gear: [] },
-                    { x: this.GRID_SIZE-1, y: 0, hp: 100, weapon: 'pistol', emoji: '🧑', alive: true, gear: [] },
-                    { x: this.GRID_SIZE-1, y: this.GRID_SIZE-1, hp: 100, weapon: 'pistol', emoji: '🧔', alive: true, gear: [] }
-                ];
-            }
-            
-            initWeapons() {
+            initGameData() {
+                // Initialize weapons
                 this.weapons = {
-                    pistol: { name: 'Pistol', damage: 15, range: 5, type: 'linear' },
-                    rifle: { name: 'Rifle', damage: 25, range: 7, type: 'linear' },
-                    shotgun: { name: 'Shotgun', damage: 30, range: 3, type: 'spread' },
-                    sniper: { name: 'Sniper', damage: 40, range: 9, type: 'linear' }
+                    pistol: { name: 'Pistol', damage: 15, range: 5, type: 'linear', emoji: '🔫' },
+                    rifle: { name: 'Rifle', damage: 25, range: 7, type: 'linear', emoji: '🔫' },
+                    shotgun: { name: 'Shotgun', damage: 30, range: 3, type: 'spread', emoji: '🔫' },
+                    sniper: { name: 'Sniper', damage: 40, range: 8, type: 'linear', emoji: '🎯' }
                 };
-            }
-            
-            initGear() {
+                
+                // Initialize gear
                 this.gear = {
                     armor: { name: 'Armor', emoji: '🛡️', effect: 'reduce', value: 0.3 },
                     boots: { name: 'Boots', emoji: '👟', effect: 'move', value: 2 },
@@ -911,19 +704,63 @@
                 };
             }
             
+            initDOM() {
+                // Cache DOM elements
+                this.elements = {
+                    playerAvatar: document.getElementById('player-avatar'),
+                    playerName: document.getElementById('player-name'),
+                    playerStatus: document.getElementById('player-status'),
+                    healthFill: document.getElementById('health-fill'),
+                    healthText: document.getElementById('health-text'),
+                    weaponIcon: document.getElementById('weapon-icon'),
+                    weaponName: document.getElementById('weapon-name'),
+                    weaponStats: document.getElementById('weapon-stats'),
+                    statusMoves: document.getElementById('status-moves'),
+                    statusArmor: document.getElementById('status-armor'),
+                    statusGear: document.getElementById('status-gear'),
+                    statusMode: document.getElementById('status-mode'),
+                    playersList: document.getElementById('players-list')
+                };
+            }
+            
+            initCanvas() {
+                this.canvas = document.getElementById('game-board');
+                this.ctx = this.canvas.getContext('2d');
+                
+                // Set initial canvas size
+                this.resizeCanvas();
+                
+                // Handle resize
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            
+            resizeCanvas() {
+                const wrapper = document.getElementById('board-wrapper');
+                const size = Math.min(wrapper.clientWidth, wrapper.clientHeight);
+                
+                this.canvas.width = size;
+                this.canvas.height = size;
+                this.TILE_SIZE = Math.floor(size / this.GRID_SIZE);
+                
+                // Redraw if game is active
+                if (this.gameActive) {
+                    this.draw();
+                }
+            }
+            
             initControls() {
-                // Movement pad
-                document.querySelectorAll('.pad-button').forEach(btn => {
+                // Movement buttons
+                document.querySelectorAll('.move-btn').forEach(btn => {
                     btn.addEventListener('touchstart', (e) => {
                         e.preventDefault();
-                        const dir = btn.dataset.direction;
-                        this.handleMovement(dir);
+                        const direction = btn.dataset.direction;
+                        this.handleMovement(direction);
                         this.showTouchFeedback(e);
                     });
                     
-                    btn.addEventListener('click', () => {
-                        const dir = btn.dataset.direction;
-                        this.handleMovement(dir);
+                    btn.addEventListener('click', (e) => {
+                        const direction = btn.dataset.direction;
+                        this.handleMovement(direction);
                     });
                 });
                 
@@ -932,15 +769,12 @@
                 document.getElementById('btn-aim').addEventListener('click', () => this.toggleAim());
                 document.getElementById('btn-shoot').addEventListener('click', () => this.shoot());
                 document.getElementById('btn-end').addEventListener('click', () => this.endTurn());
-                document.getElementById('toggle-info').addEventListener('click', () => this.toggleInfo());
-                document.querySelector('.close-info').addEventListener('click', () => this.toggleInfo());
             }
             
             initModals() {
                 document.getElementById('start-game-btn').addEventListener('click', () => {
-                    document.getElementById('welcome-modal').classList.add('hidden');
-                    document.getElementById('game-container').classList.remove('hidden');
-                    this.startGame();
+                    document.getElementById('welcome-modal').style.display = 'none';
+                    this.startNewGame();
                 });
                 
                 document.getElementById('enter-house-btn').addEventListener('click', () => {
@@ -948,12 +782,157 @@
                 });
             }
             
+            startNewGame() {
+                // Reset game state
+                this.currentPlayer = 0;
+                this.movesLeft = 0;
+                this.hasShot = false;
+                this.hasRolled = false;
+                this.gameActive = true;
+                this.isIndoor = false;
+                this.currentHouse = null;
+                this.aiming = false;
+                
+                // Generate map
+                this.generateMap();
+                
+                // Initialize players
+                this.initPlayers();
+                
+                // Draw initial state
+                this.draw();
+                this.updateUI();
+                
+                // Show initial message
+                this.showMessage('Game started! Player 1 begins.');
+            }
+            
+            generateMap() {
+                this.map = [];
+                this.houses = [];
+                
+                // Create empty grid
+                for (let y = 0; y < this.GRID_SIZE; y++) {
+                    this.map[y] = [];
+                    for (let x = 0; x < this.GRID_SIZE; x++) {
+                        this.map[y][x] = null;
+                    }
+                }
+                
+                // Add obstacles (20% of tiles)
+                for (let y = 0; y < this.GRID_SIZE; y++) {
+                    for (let x = 0; x < this.GRID_SIZE; x++) {
+                        // Skip player starting positions
+                        if ((x === 0 && y === this.GRID_SIZE-1) || // Player 1
+                            (x === 0 && y === 0) || // Player 2
+                            (x === this.GRID_SIZE-1 && y === 0) || // Player 3
+                            (x === this.GRID_SIZE-1 && y === this.GRID_SIZE-1)) { // Player 4
+                            continue;
+                        }
+                        
+                        const r = Math.random();
+                        if (r < 0.15) {
+                            this.map[y][x] = { type: '🌳', blocks: true, cover: true };
+                        } else if (r < 0.18) {
+                            this.map[y][x] = { type: '🏠', blocks: false, house: true };
+                            this.houses.push({
+                                x, y,
+                                indoorMap: this.createIndoorMap(),
+                                playersInside: []
+                            });
+                        } else if (r < 0.22) {
+                            this.map[y][x] = { type: '📦', blocks: false, item: true };
+                        }
+                    }
+                }
+            }
+            
+            createIndoorMap() {
+                const size = 5;
+                const indoorMap = [];
+                
+                // Create walls
+                for (let y = 0; y < size; y++) {
+                    indoorMap[y] = [];
+                    for (let x = 0; x < size; x++) {
+                        if (x === 0 || y === 0 || x === size-1 || y === size-1) {
+                            // Door in middle of bottom wall
+                            if (x === Math.floor(size/2) && y === size-1) {
+                                indoorMap[y][x] = { type: '🚪', blocks: false, door: true };
+                            } else {
+                                indoorMap[y][x] = { type: '🧱', blocks: true };
+                            }
+                        } else {
+                            indoorMap[y][x] = null;
+                        }
+                    }
+                }
+                
+                // Add some furniture
+                const furniture = ['🛋️', '🪑'];
+                for (let i = 0; i < 3; i++) {
+                    const x = Math.floor(Math.random() * (size-2)) + 1;
+                    const y = Math.floor(Math.random() * (size-2)) + 1;
+                    // Don't block door area
+                    if (!(x === Math.floor(size/2) && y >= size-2)) {
+                        indoorMap[y][x] = { type: furniture[Math.floor(Math.random() * furniture.length)], blocks: true };
+                    }
+                }
+                
+                return indoorMap;
+            }
+            
+            initPlayers() {
+                this.players = [
+                    { 
+                        x: 0, y: this.GRID_SIZE-1, 
+                        hp: 100, maxHp: 100,
+                        weapon: 'pistol',
+                        emoji: '🧍‍♂️',
+                        alive: true,
+                        gear: [],
+                        inHouse: null,
+                        indoorPos: null
+                    },
+                    { 
+                        x: 0, y: 0, 
+                        hp: 100, maxHp: 100,
+                        weapon: 'pistol',
+                        emoji: '🧍‍♀️',
+                        alive: true,
+                        gear: [],
+                        inHouse: null,
+                        indoorPos: null
+                    },
+                    { 
+                        x: this.GRID_SIZE-1, y: 0, 
+                        hp: 100, maxHp: 100,
+                        weapon: 'pistol',
+                        emoji: '🧑',
+                        alive: true,
+                        gear: [],
+                        inHouse: null,
+                        indoorPos: null
+                    },
+                    { 
+                        x: this.GRID_SIZE-1, y: this.GRID_SIZE-1, 
+                        hp: 100, maxHp: 100,
+                        weapon: 'pistol',
+                        emoji: '🧔',
+                        alive: true,
+                        gear: [],
+                        inHouse: null,
+                        indoorPos: null
+                    }
+                ];
+            }
+            
             handleMovement(direction) {
                 if (!this.gameActive || this.aiming) return;
                 
                 const player = this.players[this.currentPlayer];
                 
-                // Check if player can move
+                // Check if can move
                 if (!this.isIndoor && this.movesLeft <= 0) {
                     if (!this.hasRolled) {
                         this.showMessage('Roll dice first!');
@@ -992,9 +971,9 @@
                     player.x = newX;
                     player.y = newY;
                     if (!this.isIndoor) this.movesLeft--;
-                    this.playSound('move');
+                    this.draw();
                 } else if (tile.blocks) {
-                    // Blocked
+                    // Blocked by obstacle
                     return;
                 } else if (tile.house) {
                     // Enter house
@@ -1007,9 +986,9 @@
                     this.map[newY][newX] = null;
                     this.pickupItem();
                     if (!this.isIndoor) this.movesLeft--;
+                    this.draw();
                 }
                 
-                this.draw();
                 this.updateUI();
             }
             
@@ -1020,8 +999,8 @@
                 const newX = player.indoorPos.x + dx;
                 const newY = player.indoorPos.y + dy;
                 
-                // Check bounds
-                if (newX < 0 || newY < 0 || newX >= 6 || newY >= 6) {
+                // Check bounds (indoor map is 5x5)
+                if (newX < 0 || newY < 0 || newX >= 5 || newY >= 5) {
                     return;
                 }
                 
@@ -1030,20 +1009,14 @@
                 if (!tile) {
                     player.indoorPos.x = newX;
                     player.indoorPos.y = newY;
-                    this.playSound('move');
+                    this.drawIndoor();
                 } else if (tile.door) {
                     this.exitHouse(player);
                     return;
-                } else if (tile.food) {
-                    player.indoorPos.x = newX;
-                    player.indoorPos.y = newY;
-                    house.indoorMap[newY][newX] = null;
-                    this.eatFood(tile);
                 } else if (tile.blocks) {
                     return;
                 }
                 
-                this.drawIndoor();
                 this.updateUI();
             }
             
@@ -1052,16 +1025,7 @@
                 if (!house) return;
                 
                 // Find door position
-                let doorX = 3, doorY = 5; // Center bottom
-                for (let y = 0; y < 6; y++) {
-                    for (let x = 0; x < 6; x++) {
-                        if (house.indoorMap[y][x] && house.indoorMap[y][x].door) {
-                            doorX = x;
-                            doorY = y;
-                            break;
-                        }
-                    }
-                }
+                let doorX = 2, doorY = 4; // Center bottom of 5x5
                 
                 player.indoorPos = { x: doorX, y: doorY };
                 house.playersInside.push(this.players.indexOf(player));
@@ -1073,7 +1037,7 @@
                 
                 this.drawIndoor();
                 this.updateUI();
-                this.playSound('enter');
+                this.showMessage('Entered house! Move freely inside.');
             }
             
             exitHouse(player) {
@@ -1091,7 +1055,7 @@
                 
                 this.draw();
                 this.updateUI();
-                this.playSound('exit');
+                this.showMessage('Exited house.');
             }
             
             pickupItem() {
@@ -1115,15 +1079,6 @@
                 }
                 
                 this.updateUI();
-                this.playSound('item');
-            }
-            
-            eatFood(tile) {
-                const player = this.players[this.currentPlayer];
-                player.hp = Math.min(100, player.hp + (tile.heal || 20));
-                this.showMessage(`Ate ${tile.type}! +${tile.heal || 20} HP`);
-                this.updateUI();
-                this.playSound('heal');
             }
             
             rollDice() {
@@ -1144,7 +1099,6 @@
                 
                 this.showMessage(`Rolled ${dice1}+${dice2}=${this.movesLeft} moves!`);
                 this.updateUI();
-                this.playSound('dice');
             }
             
             toggleAim() {
@@ -1156,18 +1110,50 @@
                     const player = this.players[this.currentPlayer];
                     this.aim = {
                         x: this.isIndoor ? player.indoorPos.x : player.x,
-                        y: this.isIndoor ? player.indoorPos.y : player.y,
-                        dx: null,
-                        dy: null,
-                        steps: 0
+                        y: this.isIndoor ? player.indoorPos.y : player.y
                     };
-                    this.showMessage('Aim mode activated. Use movement pad to aim.');
+                    this.showMessage('Aim mode: Use movement pad to aim, then SHOOT');
+                    this.updateAimOverlay();
                 } else {
                     this.clearAim();
-                    this.showMessage('Aim mode cancelled.');
+                    this.showMessage('Aim cancelled');
                 }
                 
                 this.updateUI();
+            }
+            
+            updateAimOverlay() {
+                const overlay = document.getElementById('aim-overlay');
+                overlay.innerHTML = '';
+                
+                if (!this.aiming) return;
+                
+                let x, y;
+                if (this.isIndoor) {
+                    const offset = (this.GRID_SIZE - 5) * this.TILE_SIZE / 2;
+                    x = this.aim.x * this.TILE_SIZE + offset;
+                    y = this.aim.y * this.TILE_SIZE + offset;
+                } else {
+                    x = this.aim.x * this.TILE_SIZE;
+                    y = this.aim.y * this.TILE_SIZE;
+                }
+                
+                const cell = document.createElement('div');
+                cell.style.position = 'absolute';
+                cell.style.left = x + 'px';
+                cell.style.top = y + 'px';
+                cell.style.width = this.TILE_SIZE + 'px';
+                cell.style.height = this.TILE_SIZE + 'px';
+                cell.style.border = '3px solid #ffba08';
+                cell.style.background = 'rgba(255, 186, 8, 0.2)';
+                cell.style.borderRadius = '4px';
+                cell.style.animation = 'aimPulse 1s infinite';
+                
+                overlay.appendChild(cell);
+            }
+            
+            clearAim() {
+                document.getElementById('aim-overlay').innerHTML = '';
             }
             
             shoot() {
@@ -1182,17 +1168,16 @@
                     if (this.checkLineOfSight(shooter, target)) {
                         this.applyDamage(shooter, target, weapon.damage);
                     } else {
-                        this.showMessage('Shot blocked!');
+                        this.showMessage('Shot blocked by cover!');
                     }
                 } else {
-                    this.showMessage('No target in aim!');
+                    this.showMessage('No target at aim location!');
                 }
                 
                 this.hasShot = true;
                 this.aiming = false;
                 this.clearAim();
                 this.updateUI();
-                this.playSound('shoot');
             }
             
             findTarget() {
@@ -1295,6 +1280,7 @@
                 }
                 
                 this.updateUI();
+                this.draw();
             }
             
             endTurn() {
@@ -1309,225 +1295,130 @@
                 
                 // Find next alive player
                 let nextPlayer = (this.currentPlayer + 1) % this.PLAYER_COUNT;
-                while (!this.players[nextPlayer].alive) {
+                let attempts = 0;
+                while (!this.players[nextPlayer].alive && attempts < this.PLAYER_COUNT) {
                     nextPlayer = (nextPlayer + 1) % this.PLAYER_COUNT;
+                    attempts++;
+                }
+                
+                if (attempts >= this.PLAYER_COUNT) {
+                    // No alive players found
+                    this.gameActive = false;
+                    return;
                 }
                 
                 this.currentPlayer = nextPlayer;
+                
+                // Update view for new player
+                if (this.players[nextPlayer].inHouse) {
+                    this.currentHouse = this.players[nextPlayer].inHouse;
+                    this.isIndoor = true;
+                    this.drawIndoor();
+                } else {
+                    this.isIndoor = false;
+                    this.currentHouse = null;
+                    this.draw();
+                }
+                
                 this.updateUI();
-                this.draw();
                 this.showMessage(`Player ${nextPlayer + 1}'s turn`);
-                this.playSound('turn');
             }
             
             updateUI() {
                 const player = this.players[this.currentPlayer];
-                
-                // Update header
-                document.getElementById('current-player-emoji').textContent = player.emoji;
-                document.getElementById('current-player-name').textContent = `Player ${this.currentPlayer + 1}`;
-                document.getElementById('current-health').textContent = player.hp;
-                
-                // Update health bar
-                const healthPercent = player.hp / 100;
-                const healthFill = document.getElementById('health-fill');
-                healthFill.style.width = `${healthPercent * 100}%`;
-                healthFill.style.background = healthPercent > 0.5 ? '#2a9d8f' : 
-                                            healthPercent > 0.25 ? '#f4a261' : '#e63946';
-                
-                // Update weapon display
                 const weapon = this.weapons[player.weapon];
-                document.getElementById('current-weapon').textContent = weapon.name;
-                document.getElementById('weapon-stats').textContent = 
-                    `Dmg: ${weapon.damage} | Range: ${weapon.range}`;
                 
-                // Update info panel
-                document.getElementById('info-moves').textContent = this.movesLeft;
-                document.getElementById('info-weapon').textContent = weapon.name;
-                document.getElementById('info-armor').textContent = 
-                    player.gear.find(g => g.effect === 'reduce') ? 'Armored' : 'None';
-                document.getElementById('info-gear').textContent = 
-                    player.gear.map(g => g.emoji).join(' ') || '-';
-                document.getElementById('info-mode').textContent = 
-                    this.isIndoor ? 'Inside House' : 
-                    this.aiming ? 'Aiming Mode' :
-                    this.movesLeft > 0 ? 'Moving' : 'Waiting';
+                // Update player info
+                this.elements.playerAvatar.textContent = player.emoji;
+                this.elements.playerName.textContent = `Player ${this.currentPlayer + 1}`;
                 
-                // Update players status
-                const playersStatus = document.getElementById('players-status');
-                playersStatus.innerHTML = this.players.map((p, i) => `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; 
-                         padding: 8px; background: ${i === this.currentPlayer ? 'rgba(42, 157, 143, 0.2)' : 'rgba(255, 255, 255, 0.05)'}; 
-                         border-radius: 6px;">
-                        <span>${p.emoji} Player ${i+1}</span>
-                        <span style="color: ${p.alive ? '#2a9d8f' : '#e63946'}">
-                            ${p.alive ? `${p.hp} HP` : 'ELIMINATED'}
-                        </span>
-                    </div>
-                `).join('');
+                // Update status text
+                let status = '';
+                if (this.isIndoor) {
+                    status = 'Inside House';
+                } else if (this.aiming) {
+                    status = 'Aiming';
+                } else if (this.movesLeft > 0) {
+                    status = `${this.movesLeft} moves left`;
+                } else if (!this.hasRolled) {
+                    status = 'Roll dice to move';
+                } else if (!this.hasShot) {
+                    status = 'Aim or end turn';
+                } else {
+                    status = 'End turn';
+                }
+                this.elements.playerStatus.textContent = status;
+                
+                // Update health
+                const healthPercent = (player.hp / player.maxHp) * 100;
+                this.elements.healthFill.style.width = `${healthPercent}%`;
+                this.elements.healthText.textContent = player.hp;
+                
+                // Health bar color
+                if (healthPercent > 60) {
+                    this.elements.healthFill.style.background = '#2a9d8f';
+                } else if (healthPercent > 30) {
+                    this.elements.healthFill.style.background = '#f4a261';
+                } else {
+                    this.elements.healthFill.style.background = '#e63946';
+                }
+                
+                // Update weapon
+                this.elements.weaponIcon.textContent = weapon.emoji;
+                this.elements.weaponName.textContent = weapon.name;
+                
+                // Apply scope bonus to range
+                let range = weapon.range;
+                player.gear.forEach(g => {
+                    if (g.effect === 'range') range += g.value;
+                });
+                
+                this.elements.weaponStats.textContent = `Damage: ${weapon.damage} | Range: ${range}`;
+                
+                // Update status
+                this.elements.statusMoves.textContent = this.movesLeft;
+                this.elements.statusArmor.textContent = player.gear.find(g => g.effect === 'reduce') ? 'Armored' : 'None';
+                this.elements.statusGear.textContent = player.gear.map(g => g.emoji).join(' ') || '-';
+                this.elements.statusMode.textContent = this.isIndoor ? 'House' : 'Outdoor';
+                
+                // Update players list
+                this.updatePlayersList();
                 
                 // Update button states
                 document.getElementById('btn-roll').disabled = this.hasRolled || this.isIndoor;
                 document.getElementById('btn-aim').disabled = this.hasShot || !this.hasRolled;
                 document.getElementById('btn-shoot').disabled = !this.aiming;
-                
-                // Update aim display
-                this.updateAimDisplay();
+                document.getElementById('btn-end').disabled = false;
             }
             
-            updateAimDisplay() {
-                const overlay = document.getElementById('aim-overlay');
-                overlay.innerHTML = '';
-                
-                if (!this.aiming) return;
-                
-                let x, y;
-                if (this.isIndoor) {
-                    const offsetX = (this.canvas.width - (6 * this.TILE_SIZE)) / 2;
-                    const offsetY = (this.canvas.height - (6 * this.TILE_SIZE)) / 2;
-                    x = this.aim.x * this.TILE_SIZE + offsetX;
-                    y = this.aim.y * this.TILE_SIZE + offsetY;
-                } else {
-                    x = this.aim.x * this.TILE_SIZE;
-                    y = this.aim.y * this.TILE_SIZE;
-                }
-                
-                const cell = document.createElement('div');
-                cell.className = 'aim-cell';
-                cell.style.left = `${x}px`;
-                cell.style.top = `${y}px`;
-                cell.style.width = `${this.TILE_SIZE}px`;
-                cell.style.height = `${this.TILE_SIZE}px`;
-                overlay.appendChild(cell);
-            }
-            
-            clearAim() {
-                document.getElementById('aim-overlay').innerHTML = '';
-                this.aim = { x: null, y: null, dx: null, dy: null, steps: 0 };
-            }
-            
-            toggleInfo() {
-                const info = document.getElementById('game-info');
-                info.style.display = info.style.display === 'block' ? 'none' : 'block';
-            }
-            
-            showMessage(text, important = false) {
-                // Use console for debugging, alert for important messages
-                console.log(text);
-                if (important) {
-                    alert(text);
-                }
-                // For production, you'd want a toast notification system
-            }
-            
-            playSound(type) {
-                // Simple sound simulation using the Web Audio API
-                try {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            updatePlayersList() {
+                let html = '';
+                this.players.forEach((p, i) => {
+                    const isCurrent = i === this.currentPlayer;
+                    const status = p.alive ? 
+                        `${p.hp} HP${p.inHouse ? ' 🏠' : ''}` : 
+                        '💀 ELIMINATED';
                     
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    let frequency = 440;
-                    let duration = 0.1;
-                    
-                    switch(type) {
-                        case 'move': frequency = 500; break;
-                        case 'shoot': frequency = 800; duration = 0.2; break;
-                        case 'dice': frequency = 600; duration = 0.3; break;
-                        case 'item': frequency = 700; break;
-                        case 'heal': frequency = 900; break;
-                        case 'enter': frequency = 400; break;
-                        case 'exit': frequency = 300; break;
-                        case 'turn': frequency = 550; break;
-                    }
-                    
-                    oscillator.frequency.value = frequency;
-                    oscillator.type = 'sine';
-                    
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-                    
-                    oscillator.start();
-                    oscillator.stop(audioContext.currentTime + duration);
-                } catch (e) {
-                    // Audio not supported - silent failure
-                }
-            }
-            
-            handleTouchStart(e) {
-                e.preventDefault();
-                const touch = e.touches[0];
-                this.touchStart = {
-                    x: touch.clientX,
-                    y: touch.clientY,
-                    time: Date.now()
-                };
+                    html += `
+                        <div style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 8px;
+                            margin-bottom: 6px;
+                            background: ${isCurrent ? 'rgba(42, 157, 143, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+                            border-radius: 6px;
+                            border-left: 3px solid ${isCurrent ? '#2a9d8f' : 'transparent'};
+                        ">
+                            <span style="font-size: 20px;">${p.emoji}</span>
+                            <span style="color: ${p.alive ? '#8ecae6' : '#e63946'}; font-size: 14px;">
+                                ${status}
+                            </span>
+                        </div>
+                    `;
+                });
                 
-                this.showTouchFeedback(e);
-            }
-            
-            handleTouchMove(e) {
-                e.preventDefault();
-            }
-            
-            handleTouchEnd(e) {
-                if (!this.touchStart) return;
-                
-                const touch = e.changedTouches[0];
-                const dx = touch.clientX - this.touchStart.x;
-                const dy = touch.clientY - this.touchStart.y;
-                const dt = Date.now() - this.touchStart.time;
-                
-                // Detect swipe
-                if (dt < 300 && (Math.abs(dx) > this.swipeThreshold || Math.abs(dy) > this.swipeThreshold)) {
-                    let direction = '';
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        direction = dx > 0 ? 'right' : 'left';
-                    } else {
-                        direction = dy > 0 ? 'down' : 'up';
-                    }
-                    
-                    this.handleMovement(direction);
-                }
-                
-                this.touchStart = null;
-            }
-            
-            handleCanvasClick(e) {
-                const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                // Convert to grid coordinates
-                const gridX = Math.floor(x / this.TILE_SIZE);
-                const gridY = Math.floor(y / this.TILE_SIZE);
-                
-                if (this.aiming) {
-                    // Set aim position
-                    this.aim.x = gridX;
-                    this.aim.y = gridY;
-                    this.updateAimDisplay();
-                }
-            }
-            
-            showTouchFeedback(e) {
-                const touch = e.touches ? e.touches[0] : e;
-                const feedback = document.createElement('div');
-                feedback.className = 'touch-feedback';
-                feedback.style.left = `${touch.clientX}px`;
-                feedback.style.top = `${touch.clientY}px`;
-                
-                document.body.appendChild(feedback);
-                setTimeout(() => feedback.remove(), 400);
-            }
-            
-            startGame() {
-                this.gameActive = true;
-                this.showMessage('Game started! Player 1 begins.');
+                this.elements.playersList.innerHTML = html;
             }
             
             draw() {
@@ -1537,12 +1428,23 @@
                 for (let y = 0; y < this.GRID_SIZE; y++) {
                     for (let x = 0; x < this.GRID_SIZE; x++) {
                         // Tile background
-                        this.ctx.fillStyle = (x + y) % 2 === 0 ? '#1c3b2e' : '#2d5a45';
-                        this.ctx.fillRect(x * this.TILE_SIZE, y * this.TILE_SIZE, this.TILE_SIZE, this.TILE_SIZE);
+                        const isEven = (x + y) % 2 === 0;
+                        this.ctx.fillStyle = isEven ? '#1c3b2e' : '#2d5a45';
+                        this.ctx.fillRect(
+                            x * this.TILE_SIZE,
+                            y * this.TILE_SIZE,
+                            this.TILE_SIZE,
+                            this.TILE_SIZE
+                        );
                         
                         // Grid lines
                         this.ctx.strokeStyle = '#3a7d44';
-                        this.ctx.strokeRect(x * this.TILE_SIZE, y * this.TILE_SIZE, this.TILE_SIZE, this.TILE_SIZE);
+                        this.ctx.strokeRect(
+                            x * this.TILE_SIZE,
+                            y * this.TILE_SIZE,
+                            this.TILE_SIZE,
+                            this.TILE_SIZE
+                        );
                         
                         // Draw tile content
                         const tile = this.map[y][x];
@@ -1551,9 +1453,8 @@
                             this.ctx.textAlign = 'center';
                             this.ctx.textBaseline = 'middle';
                             
-                            // Tile colors
+                            // Set color based on tile type
                             if (tile.type === '🌳') this.ctx.fillStyle = '#2e7d32';
-                            else if (tile.type === '🪨') this.ctx.fillStyle = '#757575';
                             else if (tile.type === '🏠') this.ctx.fillStyle = '#8d6e63';
                             else if (tile.type === '📦') this.ctx.fillStyle = '#ffd700';
                             
@@ -1566,7 +1467,7 @@
                     }
                 }
                 
-                // Draw outdoor players
+                // Draw players
                 this.players.forEach((player, index) => {
                     if (!player.alive || player.indoorPos) return;
                     
@@ -1579,33 +1480,28 @@
                 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                const indoorSize = 6;
-                const offsetX = (this.canvas.width - (indoorSize * this.TILE_SIZE)) / 2;
-                const offsetY = (this.canvas.height - (indoorSize * this.TILE_SIZE)) / 2;
+                const indoorSize = 5;
+                const offset = (this.GRID_SIZE - indoorSize) * this.TILE_SIZE / 2;
                 
-                // Draw indoor map
+                // Draw indoor background
+                this.ctx.fillStyle = '#8b4513';
+                this.ctx.fillRect(offset, offset, indoorSize * this.TILE_SIZE, indoorSize * this.TILE_SIZE);
+                
+                // Draw indoor tiles
                 for (let y = 0; y < indoorSize; y++) {
                     for (let x = 0; x < indoorSize; x++) {
-                        // Tile background
-                        this.ctx.fillStyle = '#8b4513';
-                        this.ctx.fillRect(
-                            x * this.TILE_SIZE + offsetX, 
-                            y * this.TILE_SIZE + offsetY, 
-                            this.TILE_SIZE, 
-                            this.TILE_SIZE
-                        );
+                        const tile = this.currentHouse.indoorMap[y][x];
                         
                         // Grid lines
                         this.ctx.strokeStyle = '#a0522d';
                         this.ctx.strokeRect(
-                            x * this.TILE_SIZE + offsetX, 
-                            y * this.TILE_SIZE + offsetY, 
-                            this.TILE_SIZE, 
+                            x * this.TILE_SIZE + offset,
+                            y * this.TILE_SIZE + offset,
+                            this.TILE_SIZE,
                             this.TILE_SIZE
                         );
                         
                         // Draw tile content
-                        const tile = this.currentHouse.indoorMap[y][x];
                         if (tile) {
                             this.ctx.font = `${this.TILE_SIZE * 0.6}px Arial`;
                             this.ctx.textAlign = 'center';
@@ -1614,17 +1510,12 @@
                             if (tile.type === '🧱') this.ctx.fillStyle = '#795548';
                             else if (tile.type === '🛋️') this.ctx.fillStyle = '#ff9800';
                             else if (tile.type === '🪑') this.ctx.fillStyle = '#8d6e63';
-                            else if (tile.type === '📦') this.ctx.fillStyle = '#ffd700';
                             else if (tile.type === '🚪') this.ctx.fillStyle = '#4CAF50';
-                            else if (tile.food) {
-                                if (tile.type === '🍎') this.ctx.fillStyle = '#f44336';
-                                else if (tile.type === '🍗') this.ctx.fillStyle = '#ff9800';
-                            }
                             
                             this.ctx.fillText(
                                 tile.type,
-                                x * this.TILE_SIZE + offsetX + this.TILE_SIZE / 2,
-                                y * this.TILE_SIZE + offsetY + this.TILE_SIZE / 2
+                                x * this.TILE_SIZE + offset + this.TILE_SIZE / 2,
+                                y * this.TILE_SIZE + offset + this.TILE_SIZE / 2
                             );
                         }
                     }
@@ -1634,20 +1525,26 @@
                 this.currentHouse.playersInside.forEach(playerIndex => {
                     const player = this.players[playerIndex];
                     if (player.indoorPos) {
-                        this.drawPlayer(player, playerIndex, player.indoorPos.x, player.indoorPos.y, offsetX, offsetY);
+                        this.drawPlayer(
+                            player, 
+                            playerIndex, 
+                            player.indoorPos.x, 
+                            player.indoorPos.y,
+                            offset
+                        );
                     }
                 });
             }
             
-            drawPlayer(player, index, x, y, offsetX = 0, offsetY = 0) {
-                const screenX = x * this.TILE_SIZE + offsetX;
-                const screenY = y * this.TILE_SIZE + offsetY;
+            drawPlayer(player, index, x, y, offset = 0) {
+                const screenX = x * this.TILE_SIZE + offset;
+                const screenY = y * this.TILE_SIZE + offset;
                 
                 // Player colors
                 const colors = ['#ff5252', '#2196F3', '#ffeb3b', '#e91e63'];
                 const color = colors[index % colors.length];
                 
-                // Draw player circle
+                // Draw player background circle
                 this.ctx.fillStyle = color;
                 this.ctx.beginPath();
                 this.ctx.arc(
@@ -1670,10 +1567,11 @@
                     screenY + this.TILE_SIZE / 2
                 );
                 
-                // Draw health indicator
+                // Draw health number if not full
                 if (player.hp < 100) {
-                    this.ctx.fillStyle = player.hp > 50 ? '#4CAF50' : player.hp > 25 ? '#ff9800' : '#f44336';
                     this.ctx.font = `${this.TILE_SIZE * 0.3}px Arial`;
+                    this.ctx.fillStyle = player.hp > 50 ? '#4CAF50' : 
+                                        player.hp > 25 ? '#ff9800' : '#f44336';
                     this.ctx.fillText(
                         player.hp,
                         screenX + this.TILE_SIZE / 2,
@@ -1696,12 +1594,54 @@
                     this.ctx.stroke();
                 }
             }
+            
+            showMessage(text, important = false) {
+                console.log(text); // For debugging
+                if (important) {
+                    alert(text);
+                }
+            }
+            
+            showTouchFeedback(event) {
+                const touch = event.touches ? event.touches[0] : event;
+                const feedback = document.createElement('div');
+                feedback.style.position = 'fixed';
+                feedback.style.left = `${touch.clientX}px`;
+                feedback.style.top = `${touch.clientY}px`;
+                feedback.style.width = '60px';
+                feedback.style.height = '60px';
+                feedback.style.background = 'rgba(42, 157, 143, 0.3)';
+                feedback.style.borderRadius = '50%';
+                feedback.style.transform = 'scale(0)';
+                feedback.style.animation = 'touchRipple 0.4s ease-out';
+                feedback.style.pointerEvents = 'none';
+                feedback.style.zIndex = '9999';
+                
+                document.body.appendChild(feedback);
+                setTimeout(() => feedback.remove(), 400);
+            }
         }
 
         // Initialize game when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            // Create game instance immediately
-            window.game = new MobileBattleRoyale();
+            // Create global game instance
+            window.battleRoyale = new BattleRoyaleGame();
+            
+            // Add CSS for touch feedback animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes touchRipple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+                @keyframes aimPulse {
+                    0%, 100% { opacity: 0.5; }
+                    50% { opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
         });
     </script>
 </body>

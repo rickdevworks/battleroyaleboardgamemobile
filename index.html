@@ -716,25 +716,23 @@
                 this.touchStart = null;
                 this.swipeThreshold = 30;
                 
-                // Initialize after DOM is ready
+                // Initialize immediately
                 this.init();
             }
             
             init() {
-                // Wait for DOM
-                setTimeout(() => {
-                    this.initCanvas();
-                    this.initGame();
-                    this.initControls();
-                    this.initModals();
-                    
-                    // Hide loading screen
-                    document.getElementById('loading-screen').classList.add('hidden');
-                    document.getElementById('welcome-modal').style.display = 'flex';
-                    
-                    // Prevent context menu on mobile
-                    document.addEventListener('contextmenu', (e) => e.preventDefault());
-                }, 500);
+                // Initialize everything synchronously
+                this.initCanvas();
+                this.initGame();
+                this.initControls();
+                this.initModals();
+                
+                // Hide loading screen and show welcome modal
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('welcome-modal').style.display = 'flex';
+                
+                // Prevent context menu on mobile
+                document.addEventListener('contextmenu', (e) => e.preventDefault());
             }
             
             initCanvas() {
@@ -1407,47 +1405,50 @@
             }
             
             showMessage(text, important = false) {
-                // Simple alert for now - can be replaced with toast notification
+                // Use console for debugging, alert for important messages
+                console.log(text);
                 if (important) {
                     alert(text);
-                } else {
-                    console.log(text);
-                    // In production, implement a toast notification system
                 }
+                // For production, you'd want a toast notification system
             }
             
             playSound(type) {
-                // Simple sound simulation
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                let frequency = 440;
-                let duration = 0.1;
-                
-                switch(type) {
-                    case 'move': frequency = 500; break;
-                    case 'shoot': frequency = 800; duration = 0.2; break;
-                    case 'dice': frequency = 600; duration = 0.3; break;
-                    case 'item': frequency = 700; break;
-                    case 'heal': frequency = 900; break;
-                    case 'enter': frequency = 400; break;
-                    case 'exit': frequency = 300; break;
-                    case 'turn': frequency = 550; break;
+                // Simple sound simulation using the Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    let frequency = 440;
+                    let duration = 0.1;
+                    
+                    switch(type) {
+                        case 'move': frequency = 500; break;
+                        case 'shoot': frequency = 800; duration = 0.2; break;
+                        case 'dice': frequency = 600; duration = 0.3; break;
+                        case 'item': frequency = 700; break;
+                        case 'heal': frequency = 900; break;
+                        case 'enter': frequency = 400; break;
+                        case 'exit': frequency = 300; break;
+                        case 'turn': frequency = 550; break;
+                    }
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + duration);
+                } catch (e) {
+                    // Audio not supported - silent failure
                 }
-                
-                oscillator.frequency.value = frequency;
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-                
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + duration);
             }
             
             handleTouchStart(e) {
@@ -1690,15 +1691,8 @@
             }
         }
 
-        // Initialize game when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            // Detect mobile device
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (!isMobile) {
-                alert('This game is optimized for mobile devices. Please play on a smartphone for the best experience.');
-            }
-            
+        // Initialize game immediately
+        window.addEventListener('load', () => {
             // Start game
             window.game = new MobileBattleRoyale();
         });

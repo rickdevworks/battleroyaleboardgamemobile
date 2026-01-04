@@ -345,7 +345,7 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.9);
-            display: none;
+            display: flex;
             justify-content: center;
             align-items: center;
             z-index: 2000;
@@ -609,7 +609,7 @@
     </div>
 
     <!-- WELCOME MODAL -->
-    <div id="welcome-modal" class="modal-overlay">
+    <div id="welcome-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>🎮 MOBILE BATTLE ROYALE 🎮</h2>
@@ -717,22 +717,41 @@
                 this.swipeThreshold = 30;
                 
                 // Initialize immediately
-                this.init();
+                this.initializeGame();
             }
             
-            init() {
-                // Initialize everything synchronously
-                this.initCanvas();
-                this.initGame();
-                this.initControls();
-                this.initModals();
-                
-                // Hide loading screen and show welcome modal
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('welcome-modal').style.display = 'flex';
-                
-                // Prevent context menu on mobile
-                document.addEventListener('contextmenu', (e) => e.preventDefault());
+            initializeGame() {
+                try {
+                    // Hide loading screen and show welcome modal immediately
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('welcome-modal').classList.remove('hidden');
+                    
+                    // Initialize canvas
+                    this.initCanvas();
+                    
+                    // Initialize game data
+                    this.initMap();
+                    this.initPlayers();
+                    this.initWeapons();
+                    this.initGear();
+                    
+                    // Initialize controls and modals
+                    this.initControls();
+                    this.initModals();
+                    
+                    // Draw initial state
+                    this.draw();
+                    this.updateUI();
+                    
+                    // Prevent context menu on mobile
+                    document.addEventListener('contextmenu', (e) => e.preventDefault());
+                    
+                } catch (error) {
+                    console.error('Game initialization error:', error);
+                    // Fallback - hide loading and show error
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('welcome-modal').classList.remove('hidden');
+                }
             }
             
             initCanvas() {
@@ -769,18 +788,6 @@
                 if (this.players) {
                     this.draw();
                 }
-            }
-            
-            initGame() {
-                // Initialize game data
-                this.initMap();
-                this.initPlayers();
-                this.initWeapons();
-                this.initGear();
-                
-                // Draw initial state
-                this.draw();
-                this.updateUI();
             }
             
             initMap() {
@@ -931,7 +938,7 @@
             
             initModals() {
                 document.getElementById('start-game-btn').addEventListener('click', () => {
-                    document.getElementById('welcome-modal').style.display = 'none';
+                    document.getElementById('welcome-modal').classList.add('hidden');
                     document.getElementById('game-container').classList.remove('hidden');
                     this.startGame();
                 });
@@ -1691,9 +1698,9 @@
             }
         }
 
-        // Initialize game immediately
-        window.addEventListener('load', () => {
-            // Start game
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create game instance immediately
             window.game = new MobileBattleRoyale();
         });
     </script>

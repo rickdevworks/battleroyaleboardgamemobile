@@ -56,7 +56,7 @@
             font-size: 28px;
         }
 
-        #fullscreen-btn {
+        #fullscreen-btn, #skip-fullscreen-btn {
             background: #2ecc71;
             border: none;
             border-radius: 15px;
@@ -68,11 +68,13 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            width: auto;
         }
 
-        #fullscreen-btn:active {
+        #fullscreen-btn:active, #skip-fullscreen-btn:active {
             transform: scale(0.98);
         }
 
@@ -217,6 +219,9 @@
         }
 
         .action-btn.roll { background: #f39c12; }
+        .action-btn.roll.pulse {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
         .action-btn.aim { background: #e74c3c; }
         .action-btn.shoot { background: #c0392b; }
         .action-btn.end { background: #7f8c8d; }
@@ -228,6 +233,34 @@
         .action-btn.rules { 
             background: #1abc9c;
             height: 35px;
+        }
+        .action-btn.reset { 
+            background: #e67e22;
+            height: 35px;
+        }
+        .action-btn.fullscreen-toggle { 
+            background: #8e44ad;
+            height: 35px;
+        }
+        .action-btn.fullscreen-toggle.active { 
+            background: #27ae60;
+        }
+        .action-btn.fullscreen-toggle.pulse {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        /* Pulsating glow animation */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 
+                            0 0 30px rgba(255, 215, 0, 0.6),
+                            0 2px 4px rgba(0,0,0,0.3);
+                transform: scale(1.05);
+            }
         }
 
         /* Center game area */
@@ -620,10 +653,19 @@
             For best experience, enable fullscreen mode.
         </p>
         <button id="fullscreen-btn" onclick="enterFullscreen()">
-            <span>📱</span> Enter Fullscreen
+            <span>📱</span> Enter Fullscreen & Play
         </button>
-        <p style="margin-top: 20px; font-size: 14px; color: #95a5a6;">
-            If fullscreen doesn't work, the game will still function.<br>
+        <button id="skip-fullscreen-btn" onclick="skipFullscreen()" style="background: #7f8c8d; margin-top: 10px;">
+            <span>▶️</span> Play Without Fullscreen
+        </button>
+        <div style="margin-top: 25px; padding: 15px; background: rgba(52, 73, 94, 0.5); border-radius: 10px; max-width: 400px; font-size: 13px; line-height: 1.6;">
+            <p style="color: #ecf0f1; margin-bottom: 8px;"><strong>ℹ️ To Exit Fullscreen:</strong></p>
+            <p style="color: #bdc3c7; margin: 0;">
+                <strong>Desktop:</strong> Press <kbd style="background: #34495e; padding: 2px 6px; border-radius: 3px; font-size: 11px;">ESC</kbd> key<br>
+                <strong>Mobile:</strong> Swipe down from top or use back button
+            </p>
+        </div>
+        <p style="margin-top: 15px; font-size: 13px; color: #95a5a6;">
             Make sure your device is in landscape mode.
         </p>
     </div>
@@ -676,6 +718,14 @@
                 <button class="action-btn rules" onclick="showRules()">
                     <span class="icon">📖</span>
                     <span>Rules</span>
+                </button>
+                <button class="action-btn fullscreen-toggle" id="fullscreen-toggle-btn" onclick="toggleFullscreen()">
+                    <span class="icon">⛶</span>
+                    <span id="fullscreen-label">Fullscreen</span>
+                </button>
+                <button class="action-btn reset" onclick="resetGame()">
+                    <span class="icon">🔄</span>
+                    <span>Reset</span>
                 </button>
             </div>
 
@@ -756,51 +806,6 @@
         // Global game instance
         let game = null;
 
-        // Fullscreen functionality
-        async function enterFullscreen() {
-            const elem = document.documentElement;
-            
-            try {
-                // Try different fullscreen methods
-                if (elem.requestFullscreen) {
-                    await elem.requestFullscreen();
-                } else if (elem.mozRequestFullScreen) { /* Firefox */
-                    await elem.mozRequestFullScreen();
-                } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-                    await elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) { /* IE/Edge */
-                    await elem.msRequestFullscreen();
-                }
-                
-                // Fullscreen succeeded - hide overlay and show game
-                setTimeout(() => {
-                    document.getElementById('fullscreen-overlay').style.display = 'none';
-                    checkOrientation();
-                    initGame();
-                }, 200);
-                
-            } catch (err) {
-                // Fullscreen failed or denied - start game anyway
-                console.log('Fullscreen not available or denied:', err);
-                document.getElementById('fullscreen-overlay').style.display = 'none';
-                checkOrientation();
-                initGame();
-            }
-        }
-
-        // Exit fullscreen (for debugging)
-        function exitFullscreen() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        }
-
         // Check orientation
         function checkOrientation() {
             const warning = document.getElementById('landscape-warning');
@@ -821,7 +826,10 @@
 
         // Game class
         class MobileBattleRoyale {
-            constructor() {
+            constructor(playerCount = 4) {
+                // Store player count
+                this.playerCount = playerCount;
+                
                 // Core grid constants
                 this.GRID_SIZE = 15;
                 this.INDOOR_SIZE = 8;
@@ -874,6 +882,7 @@
                 
                 // Setup canvas
                 this.setupCanvas();
+                this.handleResize(); // Position overlays correctly
                 this.updateUI();
                 this.draw();
             }
@@ -946,32 +955,61 @@
             }
             
             initPlayers() {
-                this.players = [
-                    {
-                        x: 0, y: 14, hp: 100, maxHp: 100,
-                        weapon: 'pistol', armor: null, gear: [],
-                        alive: true, inHouse: null, indoorPos: null,
-                        emoji: '😎', color: '#3498db'
-                    },
-                    {
-                        x: 0, y: 0, hp: 100, maxHp: 100,
-                        weapon: 'pistol', armor: null, gear: [],
-                        alive: true, inHouse: null, indoorPos: null,
-                        emoji: '🤠', color: '#e74c3c'
-                    },
-                    {
-                        x: 14, y: 0, hp: 100, maxHp: 100,
-                        weapon: 'pistol', armor: null, gear: [],
-                        alive: true, inHouse: null, indoorPos: null,
-                        emoji: '🦹', color: '#2ecc71'
-                    },
-                    {
-                        x: 14, y: 14, hp: 100, maxHp: 100,
-                        weapon: 'pistol', armor: null, gear: [],
-                        alive: true, inHouse: null, indoorPos: null,
-                        emoji: '🧙', color: '#f39c12'
-                    }
+                // Random player emoticons pool (excluding Group 4)
+                const playerEmoticons = [
+                    // Group 1 - Classic Faces
+                    '😀', '😎', '🤠', '🥳',
+                    // Group 2 - Cool Characters
+                    '🤓', '🧐', '😇', '🤡',
+                    // Group 3 - Fantasy/Hero
+                    '🦸', '🧙', '🧛', '🧟',
+                    // Group 5 - Fun Characters
+                    '🤖', '👽', '👻', '🐱‍👤'
                 ];
+                
+                // Shuffle and pick emoticons based on player count
+                const shuffled = [...playerEmoticons].sort(() => Math.random() - 0.5);
+                const selectedEmoticons = shuffled.slice(0, this.playerCount);
+                
+                // Define spawn positions and colors based on player count
+                const spawnConfig = {
+                    2: [
+                        { x: 0, y: 14, color: '#3498db' },   // Bottom-left (Player 1)
+                        { x: 14, y: 0, color: '#e74c3c' }    // Top-right (Player 2)
+                    ],
+                    3: [
+                        { x: 0, y: 14, color: '#3498db' },   // Bottom-left (Player 1)
+                        { x: 0, y: 0, color: '#e74c3c' },    // Top-left (Player 2)
+                        { x: 14, y: 0, color: '#2ecc71' }    // Top-right (Player 3)
+                    ],
+                    4: [
+                        { x: 0, y: 14, color: '#3498db' },   // Bottom-left (Player 1)
+                        { x: 0, y: 0, color: '#e74c3c' },    // Top-left (Player 2)
+                        { x: 14, y: 0, color: '#2ecc71' },   // Top-right (Player 3)
+                        { x: 14, y: 14, color: '#f39c12' }   // Bottom-right (Player 4)
+                    ]
+                };
+                
+                const spawns = spawnConfig[this.playerCount];
+                
+                // Create players dynamically
+                this.players = [];
+                for (let i = 0; i < this.playerCount; i++) {
+                    this.players.push({
+                        x: spawns[i].x,
+                        y: spawns[i].y,
+                        hp: 100,
+                        maxHp: 100,
+                        weapon: 'pistol',
+                        armor: null,
+                        gear: [],
+                        alive: true,
+                        inHouse: null,
+                        indoorPos: null,
+                        emoji: selectedEmoticons[i],
+                        color: spawns[i].color
+                    });
+                }
             }
             
             initMap() {
@@ -1254,6 +1292,7 @@
                 this.hasRolled = true;
                 this.updateUI();
                 this.playSound(500);
+                this.stopMove();
                 alert(`🎲 Rolled ${this.movesLeft} movement points!`);
             }
             
@@ -1377,6 +1416,7 @@
                     this.updateUI();
                     this.draw();
                     this.playSound(700);
+                    this.stopMove();
                     alert(`🍗 Healed ${tile.healAmount} HP!`);
                     return;
                 }
@@ -1390,6 +1430,79 @@
                     this.playSound(600);
                     return;
                 }
+            }
+            
+            enterHouse(player, houseX, houseY) {
+                // Find the house at this position
+                const house = this.houses.find(h => h.x === houseX && h.y === houseY);
+                if (!house) return;
+                
+                // Find the door position in the indoor map
+                let doorX = null, doorY = null;
+                for (let y = 0; y < 8; y++) {
+                    for (let x = 0; x < 8; x++) {
+                        const tile = house.indoorMap[y][x];
+                        if (tile && tile.door) {
+                            doorX = x;
+                            doorY = y;
+                            break;
+                        }
+                    }
+                    if (doorX !== null) break;
+                }
+                
+                if (doorX === null || doorY === null) return;
+                
+                // Set player as inside the house
+                player.inHouse = house;
+                player.indoorPos = { x: doorX, y: doorY };
+                
+                // Add player to house's player list
+                const playerIndex = this.players.indexOf(player);
+                if (!house.playersInside.includes(playerIndex)) {
+                    house.playersInside.push(playerIndex);
+                }
+                
+                // Update view if this is the current player
+                if (this.players[this.currentPlayer] === player) {
+                    this.currentHouse = house;
+                    this.isIndoor = true;
+                }
+                
+                this.updateUI();
+                this.draw();
+                this.playSound(400);
+            }
+            
+            exitHouse(player) {
+                if (!player.inHouse) return;
+                
+                const house = player.inHouse;
+                const houseX = house.x;
+                const houseY = house.y;
+                
+                // Remove player from house's player list
+                const playerIndex = this.players.indexOf(player);
+                const housePlayerIndex = house.playersInside.indexOf(playerIndex);
+                if (housePlayerIndex > -1) {
+                    house.playersInside.splice(housePlayerIndex, 1);
+                }
+                
+                // Place player back at house entrance
+                player.x = houseX;
+                player.y = houseY;
+                player.inHouse = null;
+                player.indoorPos = null;
+                
+                // Update view if this is the current player
+                if (this.players[this.currentPlayer] === player) {
+                    this.currentHouse = null;
+                    this.isIndoor = false;
+                }
+                
+                this.updateUI();
+                this.draw();
+                this.playSound(400);
             }
             
             enterAim() {
@@ -1769,6 +1882,9 @@
             }
             
             pickupItem(player, x, y, indoor = false) {
+                // Stop any ongoing movement to prevent involuntary movement after alert
+                this.stopMove();
+                
                 const weapons = ['pistol', 'rifle', 'shotgun', 'smg', 'flamethrower', 'sniper'];
                 const gearTypes = ['armor', 'scope', 'medkit'];
                 
@@ -1826,6 +1942,7 @@
                 this.updateUI();
                 this.draw();
                 
+                this.stopMove();
                 alert(`↪️ Turn passed to Player ${this.currentPlayer + 1}`);
             }
             
@@ -1885,6 +2002,13 @@
                 [rollBtn, aimBtn, shootBtn, endBtn].forEach(btn => {
                     btn.style.opacity = btn.disabled ? '0.5' : '1';
                 });
+                
+                // Add pulsating glow to Roll Dice button when it's the primary action
+                if (!this.hasRolled && !this.aiming && !player.inHouse) {
+                    rollBtn.classList.add('pulse');
+                } else {
+                    rollBtn.classList.remove('pulse');
+                }
             }
             
             updatePlayerInfoPanel() {
@@ -2062,25 +2186,106 @@
             document.getElementById('rules-panel').classList.remove('active');
         }
 
-        // Prevent context menu
-        document.addEventListener('contextmenu', e => e.preventDefault());
+        function resetGame() {
+            if (confirm('🔄 Reset the game? All progress will be lost.')) {
+                location.reload();
+            }
+        }
 
-        // Check if already in fullscreen or landscape
-        window.addEventListener('load', () => {
-            // Check if already fullscreen or on non-mobile
+        // Toggle fullscreen on/off
+        async function toggleFullscreen() {
+            const elem = document.documentElement;
+            const btn = document.getElementById('fullscreen-toggle-btn');
+            const label = document.getElementById('fullscreen-label');
+            
             const isFullscreen = document.fullscreenElement || 
                                 document.webkitFullscreenElement || 
                                 document.mozFullScreenElement || 
                                 document.msFullscreenElement;
             
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            
-            if (!isMobile || isFullscreen) {
-                // Skip fullscreen overlay for non-mobile or already fullscreen
-                document.getElementById('fullscreen-overlay').style.display = 'none';
-                checkOrientation();
-                initGame();
+            try {
+                if (isFullscreen) {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        await document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        await document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        await document.msExitFullscreen();
+                    }
+                    btn.classList.remove('active');
+                    label.textContent = 'Fullscreen';
+                } else {
+                    // Enter fullscreen
+                    if (elem.requestFullscreen) {
+                        await elem.requestFullscreen();
+                    } else if (elem.mozRequestFullScreen) {
+                        await elem.mozRequestFullScreen();
+                    } else if (elem.webkitRequestFullscreen) {
+                        await elem.webkitRequestFullscreen();
+                    } else if (elem.msRequestFullscreen) {
+                        await elem.msRequestFullscreen();
+                    }
+                    btn.classList.add('active');
+                    label.textContent = 'Exit FS';
+                }
+            } catch (err) {
+                console.log('Fullscreen toggle failed:', err);
+                alert('⚠️ Fullscreen not supported on this device/browser');
             }
+        }
+
+        // Update button state when fullscreen changes
+        function updateFullscreenButton() {
+            const btn = document.getElementById('fullscreen-toggle-btn');
+            const label = document.getElementById('fullscreen-label');
+            const isFullscreen = document.fullscreenElement || 
+                                document.webkitFullscreenElement || 
+                                document.mozFullScreenElement || 
+                                document.msFullscreenElement;
+            
+            if (isFullscreen) {
+                btn.classList.add('active');
+                label.textContent = 'Exit FS';
+            } else {
+                btn.classList.remove('active');
+                label.textContent = 'Fullscreen';
+            }
+        }
+
+        // Prevent context menu
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Listen for fullscreen changes to update button
+        document.addEventListener('fullscreenchange', updateFullscreenButton);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+        document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+        document.addEventListener('MSFullscreenChange', updateFullscreenButton);
+
+        // Pulse fullscreen button for a few seconds to draw attention
+        function pulseFullscreenButton() {
+            const fsBtn = document.getElementById('fullscreen-toggle-btn');
+            if (fsBtn) {
+                fsBtn.classList.add('pulse');
+                // Remove pulse after 6 seconds (3 full cycles at 2s each)
+                setTimeout(() => {
+                    fsBtn.classList.remove('pulse');
+                }, 6000);
+            }
+        }
+
+        // Start game immediately without fullscreen overlay
+        window.addEventListener('load', () => {
+            // Hide fullscreen overlay and start game directly
+            document.getElementById('fullscreen-overlay').style.display = 'none';
+            checkOrientation();
+            initGame();
+            updateFullscreenButton(); // Set initial button state
+            
+            // Pulse fullscreen button for 6 seconds to get user's attention
+            setTimeout(pulseFullscreenButton, 500); // Small delay to ensure DOM is ready
         });
     </script>
 </body>
